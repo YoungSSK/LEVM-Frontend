@@ -1,9 +1,51 @@
 import { useEffect } from "react";
+import type { ReactNode } from "react";
+import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import { Toaster } from "sonner";
-import { BrowserRouter, Route, Routes } from "react-router";
-import AuthPage from "./pages/AuthPage.tsx";
-import HomePage from "./pages/HomePage.tsx";
-import { authStore } from "@/stores/auth.store";
+
+import AdminLayout from "@/components/layout/AdminLayout";
+import AuthPage from "@/features/auth/AuthPage";
+import DashboardPage from "@/features/dashboard/DashboardPage";
+import OccupationPage from "@/features/occupation/OccupationPage";
+import VocabularyPage from "@/features/vocabulary/VocabularyPage";
+import { authStore, useAuthStore } from "@/stores/authStore";
+
+function ProtectedRoute({ children }: { children: ReactNode }) {
+  const { accessToken, hydrated } = useAuthStore();
+
+  if (!hydrated) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-background text-foreground">
+        <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
+      </div>
+    );
+  }
+
+  if (!accessToken) {
+    return <Navigate to="/auth" replace />;
+  }
+
+  return <>{children}</>;
+}
+
+function AnonymousRoute({ children }: { children: ReactNode }) {
+  const { accessToken, hydrated } = useAuthStore();
+
+  if (!hydrated) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-background text-foreground">
+        <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
+      </div>
+    );
+  }
+
+  if (accessToken) {
+    return <Navigate to="/" replace />;
+  }
+
+  return <>{children}</>;
+}
+
 function App() {
   useEffect(() => {
     void authStore.bootstrapSession();
@@ -14,9 +56,27 @@ function App() {
       <Toaster position="bottom-right" richColors />
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<HomePage />} />
-          {/* public routes */}
-          <Route path="/auth" element={<AuthPage />} />
+          <Route
+            path="/"
+            element={
+              <ProtectedRoute>
+                <AdminLayout />
+              </ProtectedRoute>
+            }
+          >
+            <Route index element={<DashboardPage />} />
+            <Route path="occupation" element={<OccupationPage />} />
+            <Route path="vocabulary" element={<VocabularyPage />} />
+          </Route>
+          <Route
+            path="/auth"
+            element={
+              <AnonymousRoute>
+                <AuthPage />
+              </AnonymousRoute>
+            }
+          />
+          <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </BrowserRouter>
     </div>
