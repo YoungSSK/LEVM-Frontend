@@ -2,6 +2,7 @@ import { LogOut } from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
 
 import { Button } from "@/components/ui/button";
+import { vocabularyRoutePaths } from "@/features/vocabulary/routes/vocabularyRoutes";
 import { authStore, useAuthStore } from "@/stores/authStore";
 import { useUserStore } from "@/stores/userStore";
 
@@ -10,18 +11,31 @@ function getInitials(email?: string) {
   return email.slice(0, 2).toUpperCase();
 }
 
-const PAGE_TITLES: Record<string, string> = {
-  "/": "Dashboard",
-  "/occupation": "Occupation",
-  "/vocabulary": "Vocabulary",
-};
+function getPageTitle(pathname: string) {
+  if (pathname === "/") return "Dashboard";
+  if (pathname === "/occupation") return "Occupation";
+  if (pathname === vocabularyRoutePaths.root) return "Vocabulary";
+  if (pathname === vocabularyRoutePaths.topics) return "Topics";
+  if (pathname === vocabularyRoutePaths.words) return "Words";
+  if (pathname.startsWith(`${vocabularyRoutePaths.topics}/`)) {
+    return "Topic Detail";
+  }
+  if (pathname.startsWith(`${vocabularyRoutePaths.words}/`)) {
+    return "Word Detail";
+  }
+  if (pathname.startsWith(`${vocabularyRoutePaths.lessons}/`)) {
+    return "Lesson Detail";
+  }
+  if (pathname.startsWith(vocabularyRoutePaths.root)) return "Vocabulary";
+  return "Dashboard";
+}
 
 export default function Header() {
   const navigate = useNavigate();
   const { pathname } = useLocation();
   const { role } = useAuthStore();
   const profile = useUserStore((state) => state.profile);
-  const title = PAGE_TITLES[pathname] ?? "Dashboard";
+  const title = getPageTitle(pathname);
 
   const handleLogout = () => {
     authStore.logout();

@@ -7,7 +7,12 @@ import AdminLayout from "@/components/layout/AdminLayout";
 import AuthPage from "@/features/auth/AuthPage";
 import DashboardPage from "@/features/dashboard/DashboardPage";
 import OccupationPage from "@/features/occupation/OccupationPage";
-import VocabularyPage from "@/features/vocabulary/VocabularyPage";
+import LessonDetailPage from "@/features/vocabulary/page/LessonDetailPage";
+import TopicDetailPage from "@/features/vocabulary/page/TopicDetailPage";
+import TopicPage from "@/features/vocabulary/page/TopicPage";
+import VocabularyPage from "@/features/vocabulary/page/VocabularyPage";
+import WordDetailPage from "@/features/vocabulary/page/WordDetailPage";
+import WordPage from "@/features/vocabulary/page/WordPage";
 import { authStore, useAuthStore } from "@/stores/authStore";
 
 function ProtectedRoute({ children }: { children: ReactNode }) {
@@ -66,7 +71,14 @@ function App() {
           >
             <Route index element={<DashboardPage />} />
             <Route path="occupation" element={<OccupationPage />} />
-            <Route path="vocabulary" element={<VocabularyPage />} />
+            <Route path="vocabulary" element={<VocabularyPage />}>
+              <Route index element={<Navigate to="topics" replace />} />
+              <Route path="topics" element={<TopicPage />} />
+              <Route path="topics/:topicId" element={<TopicDetailPage />} />
+              <Route path="lessons/:lessonId" element={<LessonDetailPage />} />
+              <Route path="words" element={<WordPage />} />
+              <Route path="words/:wordId" element={<WordDetailPage />} />
+            </Route>
           </Route>
           <Route
             path="/auth"

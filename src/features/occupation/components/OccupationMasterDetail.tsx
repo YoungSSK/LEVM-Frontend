@@ -1,6 +1,9 @@
+import { useState } from "react";
 import { Briefcase } from "lucide-react";
 import { useOccupationPageController } from "@/features/occupation/hooks/useOccupationPageController";
 
+import type { OccupationCategory } from "@/api/occupationCategoryApi";
+import ConfirmDeleteDialog from "@/features/vocabulary/components/ConfirmDeleteDialog";
 import OccupationCategoryPanel from "@/features/occupation/components/OccupationCategoryPanel";
 import OccupationCategorySheet from "@/features/occupation/components/OccupationCategorySheet";
 import OccupationOccupationPanel from "@/features/occupation/components/OccupationOccupationPanel";
@@ -8,6 +11,7 @@ import OccupationOccupationSheet from "@/features/occupation/components/Occupati
 
 export default function OccupationMasterDetail() {
   const controller = useOccupationPageController();
+  const [categoryToDelete, setCategoryToDelete] = useState<OccupationCategory | null>(null);
   const isCategorySheetOpen = controller.categoryEditor !== null;
   const isOccupationSheetOpen = controller.occupationEditor !== null;
 
@@ -68,7 +72,7 @@ export default function OccupationMasterDetail() {
           onCreateCategory={controller.openCreateCategory}
           onEditCategory={controller.openEditCategory}
           onToggleCategoryStatus={controller.toggleCategoryStatus}
-          onDeleteCategory={controller.deleteCategory}
+          onDeleteCategory={setCategoryToDelete}
         />
 
         <OccupationOccupationPanel
@@ -153,6 +157,28 @@ export default function OccupationMasterDetail() {
           onSubmit={controller.saveOccupation}
         />
       ) : null}
+
+      <ConfirmDeleteDialog
+        open={Boolean(categoryToDelete)}
+        title="Xóa nhóm ngành?"
+        description={
+          categoryToDelete ? (
+            <>
+              Nhóm ngành <strong>{categoryToDelete.name}</strong> sẽ bị xóa vĩnh viễn.
+            </>
+          ) : null
+        }
+        onOpenChange={(open) => {
+          if (!open) {
+            setCategoryToDelete(null);
+          }
+        }}
+        onConfirm={async () => {
+          if (!categoryToDelete) return;
+          await controller.deleteCategory(categoryToDelete);
+          setCategoryToDelete(null);
+        }}
+      />
     </div>
   );
 }

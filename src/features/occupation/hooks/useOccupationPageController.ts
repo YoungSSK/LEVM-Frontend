@@ -210,14 +210,7 @@ export function useOccupationPageController() {
       setIsSavingCategory(false);
     }
   };
-
   const deleteCategory = async (category: OccupationCategory) => {
-    const confirmed = window.confirm(
-      `Bạn chắc có muốn xóa nhóm ngành "${category.name}" không?`,
-    );
-
-    if (!confirmed) return;
-
     try {
       await occupationCategoryApi.remove(category._id);
       toast.success("Đã xóa nhóm ngành.");
@@ -231,6 +224,7 @@ export function useOccupationPageController() {
       toast.error(getErrorMessage(error));
     }
   };
+
 
   const toggleCategoryStatus = async (category: OccupationCategory) => {
     try {
