@@ -1,4 +1,4 @@
-import type { VocabularyLesson as ApiLesson, LessonWord } from "@/api/vocabularyLessonApi";
+import type { VocabularyLesson as ApiLesson } from "@/api/vocabularyLessonApi";
 import type { VocabularyTopic as ApiTopic } from "@/api/vocabularyTopicApi";
 import type { Word as ApiWord } from "@/api/wordApi";
 import type { WordMeaning as ApiMeaning } from "@/api/wordMeaningApi";
@@ -60,6 +60,7 @@ export interface CreateVocabularyLessonPayload {
   estimatedTime?: number;
   order?: number;
   topicId?: string;
+  isActive?: boolean;
 }
 
 export interface UpdateVocabularyLessonPayload {
@@ -72,19 +73,35 @@ export interface UpdateVocabularyLessonPayload {
 
 export interface CreateVocabularyWordPayload {
   word: string;
-  phonetic?: string;
-  audioUrl?: string;
+  difficulty?: import("@/api/wordApi").Difficulty;
+  pronunciations?: {
+    us?: string;
+    uk?: string;
+  };
+  audioUrls?: {
+    us?: string;
+    uk?: string;
+  };
+  imageUrl?: string;
   meanings?: {
     partOfSpeech: string;
     meaning: string;
-    example?: string;
+    exampleSentence?: string;
   }[];
 }
 
 export interface UpdateVocabularyWordPayload {
   word?: string;
-  phonetic?: string;
-  audioUrl?: string;
+  difficulty?: import("@/api/wordApi").Difficulty;
+  pronunciations?: {
+    us?: string;
+    uk?: string;
+  };
+  audioUrls?: {
+    us?: string;
+    uk?: string;
+  };
+  imageUrl?: string;
 }
 
 export interface CreateVocabularyWordMeaningPayload {

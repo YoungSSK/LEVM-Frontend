@@ -1,21 +1,22 @@
 import { useState } from "react";
 import type { FormEvent } from "react";
-import { Plus, Trash2, WandSparkles } from "lucide-react";
-
+import { Plus, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet";
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+} from "@/components/ui/sheet";
 import { Textarea } from "@/components/ui/textarea";
 import type {
   CreateVocabularyWordPayload,
   UpdateVocabularyWordPayload,
   VocabularyWord,
 } from "@/features/vocabulary/types";
-import {
-  type WordMeaningDraftValues,
-  validateWordCreateForm,
-  validateWordUpdateForm,
-} from "@/features/vocabulary/schemas/vocabularySchemas";
+import { type WordMeaningDraftValues } from "@/features/vocabulary/schemas/vocabularySchemas";
 
 interface WordFormSheetProps {
   open: boolean;
@@ -23,7 +24,7 @@ interface WordFormSheetProps {
   word: VocabularyWord | null;
   isSubmitting: boolean;
   onOpenChange: (open: boolean) => void;
-  onGenerateAudio: (payload: { word: string; phonetic?: string }) => Promise<string>;
+  // onGenerateAudio đã xóa
   onSubmit: (
     payload: CreateVocabularyWordPayload | UpdateVocabularyWordPayload,
   ) => Promise<void>;
@@ -55,91 +56,50 @@ export default function WordFormSheet({
   word,
   isSubmitting,
   onOpenChange,
-  onGenerateAudio,
   onSubmit,
 }: WordFormSheetProps) {
   const [wordValue, setWordValue] = useState(word?.word ?? "");
-  const [phonetic, setPhonetic] = useState(word?.phonetic ?? "");
-  const [audioUrl, setAudioUrl] = useState(word?.audioUrl ?? "");
+  const [pronunciationUs, setPronunciationUs] = useState(
+    word?.pronunciations?.us ?? "",
+  );
+  const [pronunciationUk, setPronunciationUk] = useState(
+    word?.pronunciations?.uk ?? "",
+  );
+  const [audioUrlUs, setAudioUrlUs] = useState(word?.audioUrls?.us ?? "");
+  const [audioUrlUk, setAudioUrlUk] = useState(word?.audioUrls?.uk ?? "");
   const [meanings, setMeanings] = useState<WordMeaningDraftValues[]>(
     mode === "create" ? [createBlankMeaning()] : [],
   );
   const [errors, setErrors] = useState<WordFormErrors>({});
-  const [isGeneratingAudio, setIsGeneratingAudio] = useState(false);
-
-  const handleGenerateAudio = async () => {
-    const trimmedWord = wordValue.trim();
-    const trimmedPhonetic = phonetic.trim();
-
-    if (!trimmedWord) {
-      setErrors((current) => ({
-        ...current,
-        word: "Word không được để trống trước khi tạo audio.",
-      }));
-      return;
-    }
-
-    setIsGeneratingAudio(true);
-
-    try {
-      const nextAudioUrl = await onGenerateAudio({
-        word: trimmedWord,
-        phonetic: trimmedPhonetic || undefined,
-      });
-
-      setAudioUrl(nextAudioUrl);
-      setErrors((current) => ({
-        ...current,
-        audioUrl: undefined,
-      }));
-    } catch (generateError) {
-      const message =
-        generateError instanceof Error
-          ? generateError.message
-          : "Không thể tạo audio.";
-      setErrors((current) => ({
-        ...current,
-        audioUrl: message,
-      }));
-    } finally {
-      setIsGeneratingAudio(false);
-    }
-  };
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
+    const basePayload = {
+      word: wordValue.trim(),
+      pronunciations: {
+        us: pronunciationUs.trim(),
+        uk: pronunciationUk.trim(),
+      },
+      audioUrls: {
+        us: audioUrlUs.trim(),
+        uk: audioUrlUk.trim(),
+      },
+    };
+
     if (mode === "create") {
-      const result = validateWordCreateForm({
-        word: wordValue,
-        phonetic,
-        audioUrl,
-        meanings,
+      await onSubmit({
+        ...basePayload,
+        meanings: meanings.map((m) => ({
+          partOfSpeech: m.partOfSpeech,
+          meaning: m.meaning,
+          exampleSentence: m.example,
+        })),
       });
-
-      if (!result.values) {
-        setErrors(result.errors);
-        return;
-      }
-
-      setErrors({});
-      await onSubmit(result.values);
       return;
     }
 
-    const result = validateWordUpdateForm({
-      word: wordValue,
-      phonetic,
-      audioUrl,
-    });
-
-    if (!result.values) {
-      setErrors(result.errors);
-      return;
-    }
-
-    setErrors({});
-    await onSubmit(result.values);
+    await onSubmit(basePayload);
   };
 
   const updateMeaning = (
@@ -187,7 +147,9 @@ export default function WordFormSheet({
           >
             <div className="grid gap-4 md:grid-cols-2">
               <div className="space-y-2">
-                <label className="text-sm font-medium text-foreground">Word</label>
+                <label className="text-sm font-medium text-foreground">
+                  Word
+                </label>
                 <Input
                   value={wordValue}
                   onChange={(event) => setWordValue(event.target.value)}
@@ -198,47 +160,57 @@ export default function WordFormSheet({
                   <p className="text-xs text-destructive">{errors.word}</p>
                 ) : null}
               </div>
-
+            </div>
+            <div className="grid gap-4 md:grid-cols-2">
               <div className="space-y-2">
                 <label className="text-sm font-medium text-foreground">
-                  Phonetic
+                  Pronunciation (US)
                 </label>
                 <Input
-                  value={phonetic}
-                  onChange={(event) => setPhonetic(event.target.value)}
+                  value={pronunciationUs}
+                  onChange={(e) => setPronunciationUs(e.target.value)}
                   placeholder="/rʌn/"
-                  aria-invalid={Boolean(errors.phonetic)}
                 />
-                {errors.phonetic ? (
-                  <p className="text-xs text-destructive">{errors.phonetic}</p>
-                ) : null}
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-foreground">
+                  Pronunciation (UK)
+                </label>
+                <Input
+                  value={pronunciationUk}
+                  onChange={(e) => setPronunciationUk(e.target.value)}
+                  placeholder="/rʌn/"
+                />
               </div>
             </div>
 
-            <div className="space-y-2">
-              <div className="flex flex-wrap items-center justify-between gap-3">
-                <label className="text-sm font-medium text-foreground">Audio URL</label>
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  onClick={() => void handleGenerateAudio()}
-                  disabled={isGeneratingAudio}
-                >
-                  <WandSparkles className="size-4" />
-                  {isGeneratingAudio ? "Đang lấy..." : "Get Audio From Dictionary API"}
-                </Button>
+            <div className="grid gap-4 md:grid-cols-2">
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-foreground">
+                  Audio URL (US)
+                </label>
+                <Input
+                  value={audioUrlUs}
+                  onChange={(e) => setAudioUrlUs(e.target.value)}
+                  placeholder="https://..."
+                />
+                {audioUrlUs.trim() ? (
+                  <audio controls src={audioUrlUs} className="w-full" />
+                ) : null}
               </div>
-              <Input
-                value={audioUrl}
-                onChange={(event) => setAudioUrl(event.target.value)}
-                placeholder="https://..."
-                aria-invalid={Boolean(errors.audioUrl)}
-              />
-              {errors.audioUrl ? (
-                <p className="text-xs text-destructive">{errors.audioUrl}</p>
-              ) : null}
-              {audioUrl.trim() ? <audio controls src={audioUrl} className="w-full" /> : null}
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-foreground">
+                  Audio URL (UK)
+                </label>
+                <Input
+                  value={audioUrlUk}
+                  onChange={(e) => setAudioUrlUk(e.target.value)}
+                  placeholder="https://..."
+                />
+                {audioUrlUk.trim() ? (
+                  <audio controls src={audioUrlUk} className="w-full" />
+                ) : null}
+              </div>
             </div>
 
             {mode === "create" ? (
@@ -253,7 +225,12 @@ export default function WordFormSheet({
                     </p>
                   </div>
 
-                  <Button type="button" variant="outline" size="sm" onClick={addMeaning}>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={addMeaning}
+                  >
                     <Plus className="size-4" />
                     Add Meaning
                   </Button>
@@ -298,7 +275,11 @@ export default function WordFormSheet({
                             <Input
                               value={meaning.partOfSpeech}
                               onChange={(event) =>
-                                updateMeaning(index, "partOfSpeech", event.target.value)
+                                updateMeaning(
+                                  index,
+                                  "partOfSpeech",
+                                  event.target.value,
+                                )
                               }
                               placeholder="Verb"
                               aria-invalid={Boolean(itemErrors.partOfSpeech)}
@@ -317,7 +298,11 @@ export default function WordFormSheet({
                             <Textarea
                               value={meaning.meaning}
                               onChange={(event) =>
-                                updateMeaning(index, "meaning", event.target.value)
+                                updateMeaning(
+                                  index,
+                                  "meaning",
+                                  event.target.value,
+                                )
                               }
                               placeholder="chạy"
                               aria-invalid={Boolean(itemErrors.meaning)}
@@ -337,7 +322,11 @@ export default function WordFormSheet({
                           <Textarea
                             value={meaning.example}
                             onChange={(event) =>
-                              updateMeaning(index, "example", event.target.value)
+                              updateMeaning(
+                                index,
+                                "example",
+                                event.target.value,
+                              )
                             }
                             placeholder="I run every day."
                             aria-invalid={Boolean(itemErrors.example)}

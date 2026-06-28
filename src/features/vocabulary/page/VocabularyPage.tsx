@@ -17,22 +17,13 @@ export default function VocabularyPage() {
             </div>
             <div className="space-y-2">
               <h1 className="font-heading text-3xl font-semibold sm:text-4xl">
-                Topics, Lessons và Words trong một workspace
+                Quản lý hệ thống từ vựng
               </h1>
               <p className="max-w-2xl text-sm leading-6 text-white/70">
-                Quản lý từ vựng theo feature-based architecture, tối ưu cho mở
-                rộng và tái sử dụng component.
+                Tổ chức chủ đề, bài học và từ vựng tập trung. Theo dõi, cập nhật
+                và quản lý toàn bộ nội dung học tập trên hệ thống.
               </p>
             </div>
-          </div>
-
-          <div className="rounded-2xl border border-white/10 bg-white/10 px-4 py-3 text-sm text-white/80 backdrop-blur-sm">
-            <p className="text-[11px] uppercase tracking-[0.24em] text-white/60">
-              Navigation
-            </p>
-            <p className="mt-1 font-medium text-white">
-              Chọn Topics hoặc Words để bắt đầu.
-            </p>
           </div>
         </div>
       </section>

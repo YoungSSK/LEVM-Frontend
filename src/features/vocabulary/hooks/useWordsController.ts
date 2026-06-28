@@ -29,7 +29,7 @@ export function useWordsController() {
   const [wordEditor, setWordEditor] = useState<WordEditorState | null>(null);
 
   const requestRef = useRef(0);
-  const pageSize = 8;
+  const pageSize = 9;
 
   const normalizedSearch = search.trim().toLowerCase();
   const filteredWords = words.filter((word) => {

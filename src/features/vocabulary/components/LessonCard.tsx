@@ -1,9 +1,15 @@
 import { Link } from "react-router-dom";
-import { Edit2, Trash2 } from "lucide-react";
+import { Edit2, Trash2, Eye, EyeOff, Clock } from "lucide-react";
 
 import type { VocabularyLesson } from "@/features/vocabulary/types";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import StatusBadge from "@/features/vocabulary/components/StatusBadge";
 import { vocabularyRoutePaths } from "@/features/vocabulary/routes/vocabularyRoutes";
 
@@ -11,9 +17,16 @@ interface LessonCardProps {
   lesson: VocabularyLesson;
   onEdit: (lesson: VocabularyLesson) => void;
   onDelete: (lesson: VocabularyLesson) => void;
+  onToggleStatus: (lesson: VocabularyLesson) => void;
 }
 
-function LessonThumbnail({ thumbnail, title }: { thumbnail: string; title: string }) {
+function LessonThumbnail({
+  thumbnail,
+  title,
+}: {
+  thumbnail: string;
+  title: string;
+}) {
   if (!thumbnail) {
     return (
       <div className="flex aspect-[16/9] items-center justify-center rounded-2xl bg-gradient-to-br from-slate-200 to-slate-100 text-xs font-semibold uppercase tracking-[0.28em] text-slate-500">
@@ -35,6 +48,7 @@ export default function LessonCard({
   lesson,
   onEdit,
   onDelete,
+  onToggleStatus,
 }: LessonCardProps) {
   return (
     <Card className="card-hover h-full border-border shadow-sm transition-all">
@@ -51,8 +65,9 @@ export default function LessonCard({
             </p>
           </div>
           <StatusBadge
-            label={lesson.isPublished ? "Published" : "Draft"}
-            tone={lesson.isPublished ? "success" : "neutral"}
+            label={lesson.isActive ? "Hiển thị" : "Đã ẩn"}
+            tone={lesson.isActive ? "success" : "neutral"}
+            className="shrink-0 whitespace-nowrap"
           />
         </div>
       </CardHeader>
@@ -72,11 +87,12 @@ export default function LessonCard({
             </p>
           </div>
           <div>
-            <p className="text-[11px] uppercase tracking-[0.22em] text-muted-foreground">
-              Slug
+            <p className="flex items-center gap-1 text-[11px] uppercase tracking-[0.22em] text-muted-foreground">
+              <Clock className="size-3" />
+              Estimated Time
             </p>
-            <p className="mt-1 truncate font-semibold text-foreground">
-              {lesson.slug}
+            <p className="mt-1 font-semibold text-foreground">
+              {lesson.estimatedTime} phút
             </p>
           </div>
         </div>
@@ -94,6 +110,24 @@ export default function LessonCard({
         >
           <Edit2 className="size-4" />
           Edit
+        </Button>
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          onClick={() => onToggleStatus(lesson)}
+        >
+          {lesson.isActive ? (
+            <>
+              <Eye className="size-4" />
+              Hiển thị
+            </>
+          ) : (
+            <>
+              <EyeOff className="size-4" />
+              Ẩn
+            </>
+          )}
         </Button>
         <Button
           type="button"

@@ -28,13 +28,10 @@ export default function TopicFormSheet({
   const [name, setName] = useState(topic?.name ?? "");
   const [description, setDescription] = useState(topic?.description ?? "");
   const [thumbnail, setThumbnail] = useState(topic?.thumbnail ?? "");
-  const [order, setOrder] = useState(String(topic?.order ?? 0));
-  const [isActive, setIsActive] = useState(topic?.isActive ?? true);
   const [errors, setErrors] = useState<{
     name?: string;
     description?: string;
     thumbnail?: string;
-    order?: string;
   }>({});
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
@@ -44,8 +41,6 @@ export default function TopicFormSheet({
       name,
       description,
       thumbnail,
-      order,
-      isActive,
     });
 
     if (!result.values) {
@@ -125,33 +120,6 @@ export default function TopicFormSheet({
                   className="mt-2 aspect-[16/9] w-full rounded-2xl object-cover"
                 />
               ) : null}
-            </div>
-
-            <div className="grid gap-4 sm:grid-cols-2">
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-foreground">Order</label>
-                <Input
-                  type="number"
-                  min={0}
-                  value={order}
-                  onChange={(event) => setOrder(event.target.value)}
-                  placeholder="0"
-                  aria-invalid={Boolean(errors.order)}
-                />
-                {errors.order ? (
-                  <p className="text-xs text-destructive">{errors.order}</p>
-                ) : null}
-              </div>
-
-              <label className="flex items-center gap-3 rounded-2xl border border-border px-4 py-3 text-sm text-foreground">
-                <input
-                  type="checkbox"
-                  checked={isActive}
-                  onChange={(event) => setIsActive(event.target.checked)}
-                  className="size-4 rounded border-border text-primary focus:ring-primary"
-                />
-                <span>Active</span>
-              </label>
             </div>
 
             <div className="mt-auto flex gap-2 border-t border-border pt-4">

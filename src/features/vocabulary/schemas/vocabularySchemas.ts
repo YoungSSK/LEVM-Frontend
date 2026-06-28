@@ -2,7 +2,6 @@ import type {
   CreateVocabularyLessonPayload,
   CreateVocabularyMeaningPayload,
   CreateVocabularyTopicPayload,
-  CreateVocabularyWordMeaningPayload,
   CreateVocabularyWordPayload,
   UpdateVocabularyLessonPayload,
   UpdateVocabularyTopicPayload,
@@ -12,25 +11,14 @@ import type {
 
 type FieldErrors<T extends string> = Partial<Record<T, string>>;
 
-function parseOrder(value: string) {
-  if (value.trim() === "") return Number.NaN;
-  return Number.parseInt(value, 10);
-}
-
-function isValidInteger(value: number) {
-  return Number.isInteger(value) && value >= 0;
-}
-
 export interface TopicFormValues {
   name: string;
   description: string;
   thumbnail: string;
-  order: string;
-  isActive: boolean;
 }
 
 export interface TopicFormResult {
-  errors: FieldErrors<"name" | "description" | "thumbnail" | "order">;
+  errors: FieldErrors<"name" | "description" | "thumbnail">;
   values?: CreateVocabularyTopicPayload;
 }
 
@@ -38,15 +26,9 @@ export function validateTopicForm(values: TopicFormValues): TopicFormResult {
   const name = values.name.trim();
   const description = values.description.trim();
   const thumbnail = values.thumbnail.trim();
-  const order = parseOrder(values.order);
-  const errors: FieldErrors<"name" | "description" | "thumbnail" | "order"> = {};
-
+  const errors: FieldErrors<"name" | "description" | "thumbnail"> = {};
   if (!name) {
     errors.name = "Tên topic không được để trống.";
-  }
-
-  if (!isValidInteger(order)) {
-    errors.order = "Order phải là số nguyên không âm.";
   }
 
   return Object.keys(errors).length > 0
@@ -57,8 +39,6 @@ export function validateTopicForm(values: TopicFormValues): TopicFormResult {
           name,
           description: description || undefined,
           thumbnail: thumbnail || undefined,
-          order,
-          isActive: values.isActive,
         },
       };
 }
@@ -89,13 +69,12 @@ export interface LessonFormValues {
   title: string;
   description: string;
   thumbnail: string;
-  order: string;
-  isPublished: boolean;
+  estimatedTime: string;
 }
 
 export interface LessonFormResult {
   errors: FieldErrors<
-    "topicId" | "title" | "description" | "thumbnail" | "order"
+    "topicId" | "title" | "description" | "thumbnail" | "estimatedTime"
   >;
   values?: CreateVocabularyLessonPayload;
 }
@@ -106,9 +85,12 @@ export function validateLessonForm(
   const title = values.title.trim();
   const description = values.description.trim();
   const thumbnail = values.thumbnail.trim();
-  const order = parseOrder(values.order);
+  const estimatedTime =
+    values.estimatedTime.trim() === ""
+      ? undefined
+      : Number.parseInt(values.estimatedTime, 10);
   const errors: FieldErrors<
-    "topicId" | "title" | "description" | "thumbnail" | "order"
+    "topicId" | "title" | "description" | "thumbnail" | "estimatedTime"
   > = {};
 
   if (!values.topicId.trim()) {
@@ -119,8 +101,11 @@ export function validateLessonForm(
     errors.title = "Tên lesson không được để trống.";
   }
 
-  if (!isValidInteger(order)) {
-    errors.order = "Order phải là số nguyên không âm.";
+  if (
+    estimatedTime !== undefined &&
+    (!Number.isInteger(estimatedTime) || estimatedTime < 0)
+  ) {
+    errors.estimatedTime = "Estimated time phải là số nguyên không âm.";
   }
 
   return Object.keys(errors).length > 0
@@ -128,12 +113,10 @@ export function validateLessonForm(
     : {
         errors,
         values: {
-          topicId: values.topicId,
           title,
           description: description || undefined,
           thumbnail: thumbnail || undefined,
-          order,
-          isPublished: values.isPublished,
+          estimatedTime,
         },
       };
 }
@@ -272,8 +255,10 @@ export interface WordMeaningDraftValues {
 
 export interface WordCreateFormValues {
   word: string;
-  phonetic: string;
-  audioUrl: string;
+  pronunciationUs: string;
+  pronunciationUk: string;
+  audioUrlUs: string;
+  audioUrlUk: string;
   meanings: WordMeaningDraftValues[];
 }
 
@@ -284,7 +269,7 @@ export interface WordMeaningDraftErrors {
 }
 
 export interface WordCreateFormResult {
-  errors: FieldErrors<"word" | "phonetic" | "audioUrl" | "meanings"> & {
+  errors: FieldErrors<"word" | "meanings"> & {
     meaningErrors?: WordMeaningDraftErrors[];
   };
   values?: CreateVocabularyWordPayload;
@@ -294,8 +279,10 @@ export function validateWordCreateForm(
   values: WordCreateFormValues,
 ): WordCreateFormResult {
   const word = values.word.trim();
-  const phonetic = values.phonetic.trim();
-  const audioUrl = values.audioUrl.trim();
+  const pronunciationUs = values.pronunciationUs.trim();
+  const pronunciationUk = values.pronunciationUk.trim();
+  const audioUrlUs = values.audioUrlUs.trim();
+  const audioUrlUk = values.audioUrlUk.trim();
   const errors: WordCreateFormResult["errors"] = {};
   const meaningErrors: WordMeaningDraftErrors[] = [];
   const meanings = values.meanings.map((item) => ({
@@ -359,8 +346,20 @@ export function validateWordCreateForm(
         errors,
         values: {
           word,
-          phonetic: phonetic || undefined,
-          audioUrl: audioUrl || undefined,
+          pronunciations:
+            pronunciationUs || pronunciationUk
+              ? {
+                  us: pronunciationUs || undefined,
+                  uk: pronunciationUk || undefined,
+                }
+              : undefined,
+          audioUrls:
+            audioUrlUs || audioUrlUk
+              ? {
+                  us: audioUrlUs || undefined,
+                  uk: audioUrlUk || undefined,
+                }
+              : undefined,
           meanings: meanings
             .filter(
               (item) =>
@@ -368,21 +367,21 @@ export function validateWordCreateForm(
                 item.meaning.length > 0 ||
                 item.example.length > 0,
             )
-            .map(
-              (item): CreateVocabularyWordMeaningPayload => ({
-                partOfSpeech: item.partOfSpeech,
-                meaning: item.meaning,
-                example: item.example || undefined,
-              }),
-            ),
+            .map((item) => ({
+              partOfSpeech: item.partOfSpeech,
+              meaning: item.meaning,
+              exampleSentence: item.example || undefined,
+            })),
         },
       };
 }
 
 export interface WordUpdateFormValues {
   word: string;
-  phonetic: string;
-  audioUrl: string;
+  pronunciationUs: string;
+  pronunciationUk: string;
+  audioUrlUs: string;
+  audioUrlUk: string;
 }
 
 export interface WordUpdateFormResult {
@@ -394,10 +393,11 @@ export function validateWordUpdateForm(
   values: WordUpdateFormValues,
 ): WordUpdateFormResult {
   const word = values.word.trim();
-  const phonetic = values.phonetic.trim();
-  const audioUrl = values.audioUrl.trim();
-  const errors: FieldErrors<"word" | "phonetic" | "audioUrl"> = {};
-
+  const pronunciationUs = values.pronunciationUs.trim();
+  const pronunciationUk = values.pronunciationUk.trim();
+  const audioUrlUs = values.audioUrlUs.trim();
+  const audioUrlUk = values.audioUrlUk.trim();
+  const errors: FieldErrors<"word"> = {};
   if (!word) {
     errors.word = "Word không được để trống.";
   }
@@ -408,8 +408,20 @@ export function validateWordUpdateForm(
         errors,
         values: {
           word,
-          phonetic: phonetic || undefined,
-          audioUrl: audioUrl || undefined,
+          pronunciations:
+            pronunciationUs || pronunciationUk
+              ? {
+                  us: pronunciationUs || undefined,
+                  uk: pronunciationUk || undefined,
+                }
+              : undefined,
+          audioUrls:
+            audioUrlUs || audioUrlUk
+              ? {
+                  us: audioUrlUs || undefined,
+                  uk: audioUrlUk || undefined,
+                }
+              : undefined,
         },
       };
 }

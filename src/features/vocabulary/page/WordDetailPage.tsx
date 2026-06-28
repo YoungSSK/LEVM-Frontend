@@ -17,9 +17,8 @@ export default function WordDetailPage() {
   const navigate = useNavigate();
   const { wordId } = useParams<{ wordId: string }>();
   const controller = useWordDetailController(wordId);
-  const [meaningToDelete, setMeaningToDelete] = useState<VocabularyMeaning | null>(
-    null,
-  );
+  const [meaningToDelete, setMeaningToDelete] =
+    useState<VocabularyMeaning | null>(null);
   const [shouldDeleteWord, setShouldDeleteWord] = useState(false);
   const isMeaningEditorOpen = controller.meaningEditor !== null;
   const isWordEditorOpen = controller.wordEditor !== null;
@@ -55,13 +54,18 @@ export default function WordDetailPage() {
                 <h1 className="font-heading text-3xl font-semibold text-foreground">
                   {controller.word.word}
                 </h1>
-                <p className="text-sm text-muted-foreground">
-                  {controller.word.phonetic || "Chưa có phonetic."}
-                </p>
+                <div className="flex gap-3 text-sm text-muted-foreground">
+                  <span>US: {controller.word.pronunciations?.us || "—"}</span>
+                  <span>UK: {controller.word.pronunciations?.uk || "—"}</span>
+                </div>
               </div>
 
               <div className="flex flex-wrap gap-2">
-                <Button type="button" variant="outline" onClick={controller.openEditWord}>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={controller.openEditWord}
+                >
                   <Pencil className="size-4" />
                   Edit Word
                 </Button>
@@ -79,14 +83,31 @@ export default function WordDetailPage() {
             <div className="grid gap-4 md:grid-cols-[minmax(0,1fr)_auto]">
               <div className="rounded-2xl border border-border bg-muted/40 px-4 py-3">
                 <p className="text-[11px] uppercase tracking-[0.22em] text-muted-foreground">
-                  Audio URL
+                  Audio
                 </p>
-                {controller.word.audioUrl ? (
+                {controller.word.audioUrls?.us ||
+                controller.word.audioUrls?.uk ? (
                   <div className="mt-2 space-y-3">
-                    <audio controls src={controller.word.audioUrl} className="w-full" />
-                    <p className="break-all text-sm text-muted-foreground">
-                      {controller.word.audioUrl}
-                    </p>
+                    {controller.word.audioUrls?.us ? (
+                      <div>
+                        <p className="mb-1 text-xs text-muted-foreground">US</p>
+                        <audio
+                          controls
+                          src={controller.word.audioUrls.us}
+                          className="w-full"
+                        />
+                      </div>
+                    ) : null}
+                    {controller.word.audioUrls?.uk ? (
+                      <div>
+                        <p className="mb-1 text-xs text-muted-foreground">UK</p>
+                        <audio
+                          controls
+                          src={controller.word.audioUrls.uk}
+                          className="w-full"
+                        />
+                      </div>
+                    ) : null}
                   </div>
                 ) : (
                   <p className="mt-2 text-sm text-muted-foreground">
@@ -159,7 +180,6 @@ export default function WordDetailPage() {
               controller.closeWordEditor();
             }
           }}
-          onGenerateAudio={controller.generateAudio}
           onSubmit={controller.saveWord}
         />
       ) : null}

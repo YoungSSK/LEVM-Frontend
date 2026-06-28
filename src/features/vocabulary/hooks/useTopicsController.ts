@@ -9,7 +9,10 @@ import type {
   VocabularyTopic,
 } from "@/features/vocabulary/types";
 
-import { getErrorMessage, sortByOrderThenLabel } from "@/features/vocabulary/hooks/vocabularyHookUtils";
+import {
+  getErrorMessage,
+  sortByOrderThenLabel,
+} from "@/features/vocabulary/hooks/vocabularyHookUtils";
 
 type TopicEditorState =
   | { mode: "create" }
@@ -95,12 +98,6 @@ export function useTopicsController() {
 
       if (topicEditor?.mode === "edit") {
         await update(topicEditor.topic._id, cleanPayload);
-        if (
-          payload.isActive !== undefined &&
-          payload.isActive !== topicEditor.topic.isActive
-        ) {
-          await changeStatus(topicEditor.topic._id, payload.isActive);
-        }
         toast.success("Đã cập nhật topic.");
       } else {
         await create(cleanPayload);
@@ -130,6 +127,15 @@ export function useTopicsController() {
       toast.error(getErrorMessage(deleteError));
     }
   };
+  const toggleTopicStatus = async (topic: VocabularyTopic) => {
+    try {
+      await changeStatus(topic._id, !topic.isActive);
+      toast.success(topic.isActive ? "Đã tạm ẩn topic." : "Đã hiển thị topic.");
+      await loadTopics();
+    } catch (toggleError) {
+      toast.error(getErrorMessage(toggleError));
+    }
+  };
 
   return {
     topics: displayedTopics,
@@ -149,6 +155,6 @@ export function useTopicsController() {
     closeTopicEditor,
     saveTopic,
     deleteTopic,
+    toggleTopicStatus,
   };
 }
-

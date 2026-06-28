@@ -89,6 +89,7 @@ export default function TopicPage() {
               topic={topic}
               onEdit={controller.openEditTopic}
               onDelete={setTopicToDelete}
+              onToggleStatus={controller.toggleTopicStatus}
             />
           ))}
         </div>
