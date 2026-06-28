@@ -65,40 +65,23 @@ export default function TopicDetailPage() {
                   {controller.topic.description || "Không có mô tả."}
                 </p>
               </div>
-
-              <div className="rounded-2xl bg-muted/50 px-4 py-3 text-right">
-                <p className="text-xs uppercase tracking-[0.22em] text-muted-foreground">
-                  Lesson Count
-                </p>
-                <p className="mt-1 text-2xl font-semibold text-foreground">
-                  {controller.topic.lessonCount}
-                </p>
-              </div>
             </div>
 
-            <div className="grid gap-3 sm:grid-cols-3">
-              <div className="rounded-2xl border border-border bg-background px-4 py-3">
-                <p className="text-[11px] uppercase tracking-[0.22em] text-muted-foreground">
-                  Slug
-                </p>
-                <p className="mt-1 truncate font-medium text-foreground">
-                  {controller.topic.slug}
-                </p>
-              </div>
-              <div className="rounded-2xl border border-border bg-background px-4 py-3">
-                <p className="text-[11px] uppercase tracking-[0.22em] text-muted-foreground">
-                  Order
-                </p>
-                <p className="mt-1 font-medium text-foreground">
-                  {controller.topic.order}
-                </p>
-              </div>
+            <div className="grid gap-3 sm:grid-cols-2">
               <div className="rounded-2xl border border-border bg-background px-4 py-3">
                 <p className="text-[11px] uppercase tracking-[0.22em] text-muted-foreground">
                   Status
                 </p>
                 <p className="mt-1 font-medium text-foreground">
                   {controller.topic.isActive ? "Đang hoạt động" : "Tạm ẩn"}
+                </p>
+              </div>
+              <div className="rounded-2xl border border-border bg-background px-4 py-3">
+                <p className="text-[11px] uppercase tracking-[0.22em] text-muted-foreground">
+                  Lesson Count
+                </p>
+                <p className="mt-1 font-medium text-foreground">
+                  {controller.topic.lessonCount}
                 </p>
               </div>
             </div>
@@ -153,6 +136,7 @@ export default function TopicDetailPage() {
               lesson={lesson}
               onEdit={controller.openEditLesson}
               onDelete={setLessonToDelete}
+              onToggleStatus={controller.toggleLessonStatus}
             />
           ))}
         </div>

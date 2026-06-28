@@ -5,9 +5,9 @@ import { toast } from "sonner";
 import { useWordStore } from "@/stores/wordStore";
 import { useWordMeaningStore } from "@/stores/wordMeaningStore";
 import type {
-  UpdateVocabularyWordPayload,
   VocabularyMeaning,
   VocabularyWord,
+  UpdateVocabularyWordPayload,
 } from "@/features/vocabulary/types";
 
 import { getErrorMessage } from "@/features/vocabulary/hooks/vocabularyHookUtils";
@@ -144,23 +144,6 @@ export function useWordDetailController(wordId?: string) {
     }
   };
 
-  const generateAudio = async (payload: { word: string; phonetic?: string }) => {
-    try {
-      const res = await fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${encodeURIComponent(payload.word)}`);
-      if (!res.ok) throw new Error("Không tìm thấy audio trên từ điển.");
-      const data = await res.json();
-      const phonetics = data[0]?.phonetics || [];
-      const usPhonetic = phonetics.find((item: any) => item.audio && item.audio.toLowerCase().includes("-us.mp3"));
-      const ukPhonetic = phonetics.find((item: any) => item.audio && item.audio.toLowerCase().includes("-uk.mp3"));
-      const audioUrl = usPhonetic?.audio || ukPhonetic?.audio || phonetics.find((item: any) => item.audio)?.audio || "";
-      if (!audioUrl) throw new Error("Không có audio cho từ này.");
-      return audioUrl;
-    } catch (e) {
-      toast.error(getErrorMessage(e));
-      return "";
-    }
-  };
-
   const deleteWord = async () => {
     if (!word) {
       toast.info("Word chưa sẵn sàng.");
@@ -234,10 +217,8 @@ export function useWordDetailController(wordId?: string) {
     openEditWord,
     closeWordEditor,
     saveWord,
-    generateAudio,
     deleteWord,
     saveMeaning,
     deleteMeaning,
   };
 }
-
