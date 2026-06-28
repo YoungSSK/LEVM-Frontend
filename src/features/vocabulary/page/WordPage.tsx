@@ -14,7 +14,7 @@ import type { VocabularyWord } from "@/features/vocabulary/types";
 function WordSkeletonGrid() {
   return (
     <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-      {Array.from({ length: 8 }).map((_, index) => (
+      {Array.from({ length: 9 }).map((_, index) => (
         <Skeleton key={index} className="h-52 w-full rounded-3xl" />
       ))}
     </div>
@@ -120,7 +120,6 @@ export default function WordPage() {
               controller.closeWordEditor();
             }
           }}
-          onGenerateAudio={controller.generateAudio}
           onSubmit={controller.saveWord}
         />
       ) : null}

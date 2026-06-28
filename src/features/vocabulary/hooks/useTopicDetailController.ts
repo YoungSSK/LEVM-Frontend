@@ -11,7 +11,10 @@ import type {
   VocabularyTopic,
 } from "@/features/vocabulary/types";
 
-import { getErrorMessage, sortByOrderThenLabel } from "@/features/vocabulary/hooks/vocabularyHookUtils";
+import {
+  getErrorMessage,
+  sortByOrderThenLabel,
+} from "@/features/vocabulary/hooks/vocabularyHookUtils";
 
 type LessonEditorState =
   | { mode: "create" }
@@ -120,20 +123,14 @@ export function useTopicDetailController(topicId?: string) {
       title: rawPayload.title ?? "",
       description: rawPayload.description,
       thumbnail: rawPayload.thumbnail,
-      estimatedTime: rawPayload.estimatedTime ? Number(rawPayload.estimatedTime) : undefined,
+      estimatedTime: rawPayload.estimatedTime
+        ? Number(rawPayload.estimatedTime)
+        : undefined,
     };
 
     try {
       if (lessonEditor?.mode === "edit") {
         await updateLesson(lessonEditor.lesson._id, cleanPayload);
-        
-        if (
-          rawPayload.isPublished !== undefined &&
-          rawPayload.isPublished !== lessonEditor.lesson.isPublished
-        ) {
-          await changeStatus(lessonEditor.lesson._id);
-        }
-        
         toast.success("Đã cập nhật lesson.");
       } else {
         await createLesson(topic._id, cleanPayload);
@@ -152,7 +149,10 @@ export function useTopicDetailController(topicId?: string) {
       await removeLesson(lesson._id);
       toast.success("Đã xóa lesson.");
 
-      if (lessonEditor?.mode === "edit" && lessonEditor.lesson._id === lesson._id) {
+      if (
+        lessonEditor?.mode === "edit" &&
+        lessonEditor.lesson._id === lesson._id
+      ) {
         closeLessonEditor();
       }
 
@@ -161,6 +161,18 @@ export function useTopicDetailController(topicId?: string) {
       }
     } catch (deleteError) {
       toast.error(getErrorMessage(deleteError));
+    }
+  };
+  const toggleLessonStatus = async (lesson: VocabularyLesson) => {
+    try {
+      await changeStatus(lesson._id);
+      toast.success(lesson.isActive ? "Đã ẩn lesson." : "Đã hiển thị lesson.");
+
+      if (topic) {
+        await Promise.all([loadTopic(topic._id), loadLessons(topic._id)]);
+      }
+    } catch (toggleError) {
+      toast.error(getErrorMessage(toggleError));
     }
   };
 
@@ -177,6 +189,6 @@ export function useTopicDetailController(topicId?: string) {
     closeLessonEditor,
     saveLesson,
     deleteLesson,
+    toggleLessonStatus,
   };
 }
-

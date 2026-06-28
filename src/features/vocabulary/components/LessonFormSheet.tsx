@@ -3,7 +3,13 @@ import type { FormEvent } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet";
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+} from "@/components/ui/sheet";
 import { Textarea } from "@/components/ui/textarea";
 import type { VocabularyLesson } from "@/features/vocabulary/types";
 import { validateLessonForm } from "@/features/vocabulary/schemas/vocabularySchemas";
@@ -17,12 +23,10 @@ interface LessonFormSheetProps {
   isSubmitting: boolean;
   onOpenChange: (open: boolean) => void;
   onSubmit: (payload: {
-    topicId: string;
     title: string;
     description?: string;
     thumbnail?: string;
-    order: number;
-    isPublished: boolean;
+    estimatedTime?: number;
   }) => Promise<void>;
 }
 
@@ -39,14 +43,15 @@ export default function LessonFormSheet({
   const [title, setTitle] = useState(lesson?.title ?? "");
   const [description, setDescription] = useState(lesson?.description ?? "");
   const [thumbnail, setThumbnail] = useState(lesson?.thumbnail ?? "");
-  const [order, setOrder] = useState(String(lesson?.order ?? 0));
-  const [isPublished, setIsPublished] = useState(lesson?.isPublished ?? true);
+  const [estimatedTime, setEstimatedTime] = useState(
+    String(lesson?.estimatedTime ?? 0),
+  );
   const [errors, setErrors] = useState<{
     topicId?: string;
     title?: string;
     description?: string;
     thumbnail?: string;
-    order?: string;
+    estimatedTime?: string;
   }>({});
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
@@ -57,8 +62,7 @@ export default function LessonFormSheet({
       title,
       description,
       thumbnail,
-      order,
-      isPublished,
+      estimatedTime,
     });
 
     if (!result.values) {
@@ -90,9 +94,13 @@ export default function LessonFormSheet({
             onSubmit={handleSubmit}
           >
             <div className="space-y-2">
-              <label className="text-sm font-medium text-foreground">Topic</label>
+              <label className="text-sm font-medium text-foreground">
+                Topic
+              </label>
               <div className="rounded-2xl border border-border bg-muted/40 px-4 py-3">
-                <p className="text-sm font-medium text-foreground">{topicName}</p>
+                <p className="text-sm font-medium text-foreground">
+                  {topicName}
+                </p>
                 <p className="mt-1 text-xs text-muted-foreground">
                   Lesson sẽ được gắn vào topic này.
                 </p>
@@ -103,7 +111,9 @@ export default function LessonFormSheet({
             </div>
 
             <div className="space-y-2">
-              <label className="text-sm font-medium text-foreground">Title</label>
+              <label className="text-sm font-medium text-foreground">
+                Title
+              </label>
               <Input
                 value={title}
                 onChange={(event) => setTitle(event.target.value)}
@@ -152,34 +162,24 @@ export default function LessonFormSheet({
                 />
               ) : null}
             </div>
-
-            <div className="grid gap-4 sm:grid-cols-2">
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-foreground">Order</label>
-                <Input
-                  type="number"
-                  min={0}
-                  value={order}
-                  onChange={(event) => setOrder(event.target.value)}
-                  placeholder="0"
-                  aria-invalid={Boolean(errors.order)}
-                />
-                {errors.order ? (
-                  <p className="text-xs text-destructive">{errors.order}</p>
-                ) : null}
-              </div>
-
-              <label className="flex items-center gap-3 rounded-2xl border border-border px-4 py-3 text-sm text-foreground">
-                <input
-                  type="checkbox"
-                  checked={isPublished}
-                  onChange={(event) => setIsPublished(event.target.checked)}
-                  className="size-4 rounded border-border text-primary focus:ring-primary"
-                />
-                <span>Published</span>
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-foreground">
+                Estimated Time (phút)
               </label>
+              <Input
+                type="number"
+                min={0}
+                value={estimatedTime}
+                onChange={(event) => setEstimatedTime(event.target.value)}
+                placeholder="0"
+                aria-invalid={Boolean(errors.estimatedTime)}
+              />
+              {errors.estimatedTime ? (
+                <p className="text-xs text-destructive">
+                  {errors.estimatedTime}
+                </p>
+              ) : null}
             </div>
-
             <div className="mt-auto flex gap-2 border-t border-border pt-4">
               <Button
                 type="button"

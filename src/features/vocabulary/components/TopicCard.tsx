@@ -1,9 +1,15 @@
 import { Link } from "react-router-dom";
-import { Edit2, Trash2 } from "lucide-react";
+import { Edit2, Trash2, Eye, EyeOff } from "lucide-react";
 
 import type { VocabularyTopic } from "@/features/vocabulary/types";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import StatusBadge from "@/features/vocabulary/components/StatusBadge";
 import { vocabularyRoutePaths } from "@/features/vocabulary/routes/vocabularyRoutes";
 
@@ -11,9 +17,16 @@ interface TopicCardProps {
   topic: VocabularyTopic;
   onEdit: (topic: VocabularyTopic) => void;
   onDelete: (topic: VocabularyTopic) => void;
+  onToggleStatus: (topic: VocabularyTopic) => void;
 }
 
-function TopicThumbnail({ thumbnail, name }: { thumbnail: string; name: string }) {
+function TopicThumbnail({
+  thumbnail,
+  name,
+}: {
+  thumbnail: string;
+  name: string;
+}) {
   if (!thumbnail) {
     return (
       <div className="flex aspect-[16/9] items-center justify-center rounded-2xl bg-gradient-to-br from-slate-200 to-slate-100 text-xs font-semibold uppercase tracking-[0.28em] text-slate-500">
@@ -35,6 +48,7 @@ export default function TopicCard({
   topic,
   onEdit,
   onDelete,
+  onToggleStatus,
 }: TopicCardProps) {
   return (
     <Card className="card-hover h-full border-border shadow-sm transition-all">
@@ -94,6 +108,24 @@ export default function TopicCard({
         >
           <Edit2 className="size-4" />
           Edit
+        </Button>
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          onClick={() => onToggleStatus(topic)}
+        >
+          {topic.isActive ? (
+            <>
+              <Eye className="size-4" />
+              Ẩn
+            </>
+          ) : (
+            <>
+              <EyeOff className="size-4" />
+              Hiển thị
+            </>
+          )}
         </Button>
         <Button
           type="button"
