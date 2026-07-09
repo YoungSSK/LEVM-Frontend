@@ -36,7 +36,7 @@ export default function MeaningFormSheet({
 }: MeaningFormSheetProps) {
   const [partOfSpeech, setPartOfSpeech] = useState(meaning?.partOfSpeech ?? "");
   const [meaningValue, setMeaningValue] = useState(meaning?.meaning ?? "");
-  const [example, setExample] = useState(meaning?.example ?? "");
+  const [example, setExample] = useState(meaning?.exampleSentence ?? "");
   const [errors, setErrors] = useState<{
     partOfSpeech?: string;
     meaning?: string;

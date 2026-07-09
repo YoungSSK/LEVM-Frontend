@@ -70,7 +70,7 @@ export default function WordFormSheet({
   const [meanings, setMeanings] = useState<WordMeaningDraftValues[]>(
     mode === "create" ? [createBlankMeaning()] : [],
   );
-  const [errors, setErrors] = useState<WordFormErrors>({});
+  const [errors] = useState<WordFormErrors>({});
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();

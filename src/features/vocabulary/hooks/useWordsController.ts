@@ -63,9 +63,8 @@ export function useWordsController() {
       const nextWords = sortWordsByLabel(res.words).map(
         (word) => ({
           ...word,
-          meaningPreview:
-            word.meaningPreview ?? word.meanings?.[0]?.meaning ?? undefined,
-          meaningCount: word.meaningCount ?? word.meanings?.length,
+          meaningPreview: word.meanings?.[0]?.meaning ?? undefined,
+          meaningCount: word.meanings?.length ?? 0,
         }),
       );
 
@@ -113,7 +112,7 @@ export function useWordsController() {
 
     try {
       if (wordEditor?.mode === "edit") {
-        await wordApi.update(wordEditor.word._id, payload);
+        await wordApi.update(wordEditor.word.slug, payload);
         toast.success("Đã cập nhật word.");
       } else {
         const createPayload = payload as CreateVocabularyWordPayload;
@@ -128,10 +127,10 @@ export function useWordsController() {
         if (createPayload.meanings && createPayload.meanings.length > 1) {
           for (let i = 1; i < createPayload.meanings.length; i++) {
             const meaning = createPayload.meanings[i];
-            await wordMeaningApi.create(createdWord._id, {
+            await wordMeaningApi.create(createdWord.slug, {
               partOfSpeech: meaning.partOfSpeech as any,
               meaning: meaning.meaning,
-              exampleSentence: meaning.example,
+              exampleSentence: meaning.exampleSentence,
             });
           }
         }

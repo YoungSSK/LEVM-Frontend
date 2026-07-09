@@ -1,7 +1,6 @@
-import { Link } from "react-router-dom";
-import { Edit2, Trash2, Eye, EyeOff, Clock } from "lucide-react";
+import { Edit2, Trash2, Eye, EyeOff, Globe, GlobeLock, Clock } from "lucide-react";
 
-import type { VocabularyLesson } from "@/features/vocabulary/types";
+import type { GrammarLesson } from "@/api/grammarLessonApi";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -11,25 +10,25 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import StatusBadge from "@/features/vocabulary/components/StatusBadge";
-import { vocabularyRoutePaths } from "@/features/vocabulary/routes/vocabularyRoutes";
 
-interface LessonCardProps {
-  lesson: VocabularyLesson;
-  onEdit: (lesson: VocabularyLesson) => void;
-  onDelete: (lesson: VocabularyLesson) => void;
-  onToggleStatus: (lesson: VocabularyLesson) => void;
+interface GrammarLessonCardProps {
+  lesson: GrammarLesson;
+  onEdit: (lesson: GrammarLesson) => void;
+  onDelete: (lesson: GrammarLesson) => void;
+  onToggleStatus: (lesson: GrammarLesson) => void;
+  onTogglePublish: (lesson: GrammarLesson) => void;
 }
 
 function LessonThumbnail({
   thumbnail,
   title,
 }: {
-  thumbnail: string;
+  thumbnail?: string;
   title: string;
 }) {
   if (!thumbnail) {
     return (
-      <div className="flex aspect-[16/9] items-center justify-center rounded-2xl bg-gradient-to-br from-slate-200 to-slate-100 text-xs font-semibold uppercase tracking-[0.28em] text-slate-500">
+      <div className="flex aspect-[16/9] items-center justify-center rounded-2xl bg-gradient-to-br from-indigo-100 to-purple-50 text-xs font-semibold uppercase tracking-[0.28em] text-indigo-300">
         No Image
       </div>
     );
@@ -44,16 +43,17 @@ function LessonThumbnail({
   );
 }
 
-export default function LessonCard({
+export default function GrammarLessonCard({
   lesson,
   onEdit,
   onDelete,
   onToggleStatus,
-}: LessonCardProps) {
+  onTogglePublish,
+}: GrammarLessonCardProps) {
   return (
     <Card className="card-hover flex h-full flex-col border-border shadow-sm transition-all">
       <CardHeader className="space-y-3 px-5 pt-5">
-        <LessonThumbnail thumbnail={lesson.thumbnail} title={lesson.title} />
+        <LessonThumbnail thumbnail={lesson.thumbnailUrl} title={lesson.title} />
 
         <div className="flex w-full min-w-0 items-start justify-between gap-3">
           <div className="min-w-0 flex-1">
@@ -64,32 +64,33 @@ export default function LessonCard({
               Order {lesson.order}
             </p>
           </div>
-          <StatusBadge
-            label={lesson.isActive ? "Hiển thị" : "Đã ẩn"}
-            tone={lesson.isActive ? "success" : "neutral"}
-            className="shrink-0 whitespace-nowrap"
-          />
+          <div className="flex flex-col items-end gap-1">
+            <StatusBadge
+              label={lesson.lessonType === "exercise" ? "Bài tập" : "Lý thuyết"}
+              tone={lesson.lessonType === "exercise" ? "info" : "neutral"}
+            />
+            <StatusBadge
+              label={lesson.isActive ? "Hiển thị" : "Đã ẩn"}
+              tone={lesson.isActive ? "success" : "neutral"}
+            />
+            <StatusBadge
+              label={lesson.isPublished ? "Đã xuất bản" : "Bản nháp"}
+              tone={lesson.isPublished ? "success" : "warning"}
+            />
+          </div>
         </div>
       </CardHeader>
 
       <CardContent className="flex flex-1 flex-col space-y-3 px-5">
         <p className="line-clamp-3 text-sm leading-6 text-muted-foreground">
-          {lesson.description || "Chưa có mô tả."}
+          {lesson.shortDescription || "Chưa có mô tả."}
         </p>
 
         <div className="mt-auto grid grid-cols-2 gap-3 rounded-2xl bg-muted/50 p-3 text-sm">
           <div>
-            <p className="text-[11px] uppercase tracking-[0.22em] text-muted-foreground">
-              Word Count
-            </p>
-            <p className="mt-1 font-semibold text-foreground">
-              {lesson.wordCount}
-            </p>
-          </div>
-          <div>
             <p className="flex items-center gap-1 text-[11px] uppercase tracking-[0.22em] text-muted-foreground">
               <Clock className="size-3" />
-              Estimated Time
+              Thời gian
             </p>
             <p className="mt-1 font-semibold text-foreground">
               {lesson.estimatedTime} phút
@@ -99,8 +100,23 @@ export default function LessonCard({
       </CardContent>
 
       <CardFooter className="mt-auto flex flex-wrap gap-2 border-t border-border/60 px-5 py-4">
-        <Button asChild variant="outline" size="sm">
-          <Link to={vocabularyRoutePaths.lessonDetail(lesson.slug)}>View</Link>
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          onClick={() => onTogglePublish(lesson)}
+        >
+          {lesson.isPublished ? (
+            <>
+              <GlobeLock className="size-4" />
+              Gỡ xuất bản
+            </>
+          ) : (
+            <>
+              <Globe className="size-4" />
+              Xuất bản
+            </>
+          )}
         </Button>
         <Button
           type="button"
@@ -120,12 +136,12 @@ export default function LessonCard({
           {lesson.isActive ? (
             <>
               <Eye className="size-4" />
-              Hiển thị
+              Ẩn
             </>
           ) : (
             <>
               <EyeOff className="size-4" />
-              Ẩn
+              Hiển thị
             </>
           )}
         </Button>

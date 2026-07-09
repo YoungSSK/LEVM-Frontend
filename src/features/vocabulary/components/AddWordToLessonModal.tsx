@@ -115,7 +115,7 @@ export default function AddWordToLessonModal({
 
     return (
       word.word.toLowerCase().includes(normalizedQuery) ||
-      (word.phonetic || "").toLowerCase().includes(normalizedQuery) ||
+      ((word.pronunciations?.us || word.pronunciations?.uk) || "").toLowerCase().includes(normalizedQuery) ||
       (word.meaningPreview || "").toLowerCase().includes(normalizedQuery)
     );
   });
@@ -192,7 +192,7 @@ export default function AddWordToLessonModal({
                       <div className="min-w-0">
                         <p className="font-medium text-foreground">{word.word}</p>
                         <p className="mt-1 text-sm text-muted-foreground">
-                          {word.phonetic || "Chưa có phonetic"}
+                          {(word.pronunciations?.us || word.pronunciations?.uk) || "Chưa có phonetic"}
                         </p>
                         <p className="mt-1 line-clamp-2 text-sm text-muted-foreground">
                           {word.meaningPreview || "Chưa có meaning preview."}
@@ -217,7 +217,7 @@ export default function AddWordToLessonModal({
                     {selectedWord.word}
                   </h3>
                   <p className="mt-1 text-sm text-muted-foreground">
-                    {selectedWord.phonetic || "Chưa có phonetic"}
+                    {(selectedWord.pronunciations?.us || selectedWord.pronunciations?.uk) || "Chưa có phonetic"}
                   </p>
                 </div>
 
@@ -285,7 +285,7 @@ export default function AddWordToLessonModal({
                             {meaning.meaning}
                           </p>
                           <p className="mt-1 text-xs text-muted-foreground">
-                            {meaning.example || "Không có ví dụ."}
+                            {meaning.exampleSentence || "Không có ví dụ."}
                           </p>
                         </div>
                       </label>
@@ -303,7 +303,7 @@ export default function AddWordToLessonModal({
           </Button>
           <Button
             type="button"
-            disabled={isSubmitting || !selectedWord}
+            disabled={isSubmitting || !selectedWord || !selectedMeaningId}
             onClick={() => {
               void handleSubmit();
             }}

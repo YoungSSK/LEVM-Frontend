@@ -48,7 +48,7 @@ export default function MeaningList({
 
           <CardContent className="px-5">
             <p className="text-sm leading-6 text-muted-foreground">
-              {meaning.example || "Chưa có ví dụ."}
+              {meaning.exampleSentence || "Chưa có ví dụ."}
             </p>
           </CardContent>
 

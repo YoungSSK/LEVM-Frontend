@@ -20,7 +20,7 @@ type LessonEditorState =
   | { mode: "create" }
   | { mode: "edit"; lesson: VocabularyLesson };
 
-export function useTopicDetailController(topicId?: string) {
+export function useTopicDetailController(topicSlug?: string) {
   const [topic, setTopic] = useState<VocabularyTopic | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isLoadingTopic, setIsLoadingTopic] = useState(false);
@@ -41,12 +41,12 @@ export function useTopicDetailController(topicId?: string) {
 
   const topicRequestRef = useRef(0);
 
-  const loadTopic = async (nextTopicId?: string) => {
-    const currentTopicId = nextTopicId ?? topicId;
+  const loadTopic = async (nextTopicSlug?: string) => {
+    const currentTopicSlug = nextTopicSlug ?? topicSlug;
 
-    if (!currentTopicId) {
+    if (!currentTopicSlug) {
       setTopic(null);
-      setError("Thiếu topicId.");
+      setError("Thiếu topicSlug.");
       return;
     }
 
@@ -54,7 +54,7 @@ export function useTopicDetailController(topicId?: string) {
     setIsLoadingTopic(true);
 
     try {
-      const nextTopic = await vocabularyTopicApi.getById(currentTopicId);
+      const nextTopic = await vocabularyTopicApi.getById(currentTopicSlug);
 
       if (requestId !== topicRequestRef.current) return;
 
@@ -73,15 +73,15 @@ export function useTopicDetailController(topicId?: string) {
     }
   };
 
-  const loadLessons = async (nextTopicId?: string) => {
-    const currentTopicId = nextTopicId ?? topicId;
+  const loadLessons = async (nextTopicSlug?: string) => {
+    const currentTopicSlug = nextTopicSlug ?? topicSlug;
 
-    if (!currentTopicId) {
+    if (!currentTopicSlug) {
       return;
     }
 
     try {
-      await fetchByTopic(currentTopicId);
+      await fetchByTopic(currentTopicSlug);
     } catch (loadError) {
       toast.error(getErrorMessage(loadError));
     }
@@ -91,7 +91,7 @@ export function useTopicDetailController(topicId?: string) {
     setError(null);
     void loadTopic();
     void loadLessons();
-  }, [topicId]);
+  }, [topicSlug]);
 
   const openCreateLesson = () => {
     if (!topic) {
@@ -130,15 +130,15 @@ export function useTopicDetailController(topicId?: string) {
 
     try {
       if (lessonEditor?.mode === "edit") {
-        await updateLesson(lessonEditor.lesson._id, cleanPayload);
+        await updateLesson(lessonEditor.lesson.slug, cleanPayload);
         toast.success("Đã cập nhật lesson.");
       } else {
-        await createLesson(topic._id, cleanPayload);
+        await createLesson(topic.slug, cleanPayload);
         toast.success("Đã tạo lesson mới.");
       }
 
       closeLessonEditor();
-      await Promise.all([loadTopic(topic._id), loadLessons(topic._id)]);
+      await Promise.all([loadTopic(topic.slug), loadLessons(topic.slug)]);
     } catch (saveError) {
       toast.error(getErrorMessage(saveError));
     }
@@ -146,7 +146,7 @@ export function useTopicDetailController(topicId?: string) {
 
   const deleteLesson = async (lesson: VocabularyLesson) => {
     try {
-      await removeLesson(lesson._id);
+      await removeLesson(lesson.slug);
       toast.success("Đã xóa lesson.");
 
       if (
@@ -157,7 +157,7 @@ export function useTopicDetailController(topicId?: string) {
       }
 
       if (topic) {
-        await Promise.all([loadTopic(topic._id), loadLessons(topic._id)]);
+        await Promise.all([loadTopic(topic.slug), loadLessons(topic.slug)]);
       }
     } catch (deleteError) {
       toast.error(getErrorMessage(deleteError));
@@ -165,11 +165,11 @@ export function useTopicDetailController(topicId?: string) {
   };
   const toggleLessonStatus = async (lesson: VocabularyLesson) => {
     try {
-      await changeStatus(lesson._id);
+      await changeStatus(lesson.slug);
       toast.success(lesson.isActive ? "Đã ẩn lesson." : "Đã hiển thị lesson.");
 
       if (topic) {
-        await Promise.all([loadTopic(topic._id), loadLessons(topic._id)]);
+        await Promise.all([loadTopic(topic.slug), loadLessons(topic.slug)]);
       }
     } catch (toggleError) {
       toast.error(getErrorMessage(toggleError));

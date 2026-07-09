@@ -24,7 +24,7 @@ type MeaningFormPayload = {
   example?: string;
 };
 
-export function useWordDetailController(wordId?: string) {
+export function useWordDetailController(wordSlug?: string) {
   const [error, setError] = useState<string | null>(null);
   const [meaningEditor, setMeaningEditor] = useState<MeaningEditorState | null>(
     null,
@@ -53,18 +53,18 @@ export function useWordDetailController(wordId?: string) {
   const wordRequestRef = useRef(0);
   const meaningRequestRef = useRef(0);
 
-  const loadWord = async (nextWordId?: string) => {
-    const currentWordId = nextWordId ?? wordId;
+  const loadWord = async (nextWordSlug?: string) => {
+    const currentWordSlug = nextWordSlug ?? wordSlug;
 
-    if (!currentWordId) {
-      setError("Thiếu wordId.");
+    if (!currentWordSlug) {
+      setError("Thiếu wordSlug.");
       return;
     }
 
     const requestId = ++wordRequestRef.current;
 
     try {
-      await fetchWordById(currentWordId);
+      await fetchWordById(currentWordSlug);
     } catch (loadError) {
       if (requestId !== wordRequestRef.current) return;
       const message = getErrorMessage(loadError);
@@ -73,17 +73,17 @@ export function useWordDetailController(wordId?: string) {
     }
   };
 
-  const loadMeanings = async (nextWordId?: string) => {
-    const currentWordId = nextWordId ?? wordId;
+  const loadMeanings = async (nextWordSlug?: string) => {
+    const currentWordSlug = nextWordSlug ?? wordSlug;
 
-    if (!currentWordId) {
+    if (!currentWordSlug) {
       return;
     }
 
     const requestId = ++meaningRequestRef.current;
 
     try {
-      await fetchByWord(currentWordId);
+      await fetchByWord(currentWordSlug);
     } catch (loadError) {
       if (requestId !== meaningRequestRef.current) return;
       const message = getErrorMessage(loadError);
@@ -96,7 +96,7 @@ export function useWordDetailController(wordId?: string) {
     setError(null);
     void loadWord();
     void loadMeanings();
-  }, [wordId]);
+  }, [wordSlug]);
 
   const openCreateMeaning = () => {
     if (!word) {

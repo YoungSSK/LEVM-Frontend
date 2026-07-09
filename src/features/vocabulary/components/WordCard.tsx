@@ -3,7 +3,13 @@ import { Edit2, Trash2 } from "lucide-react";
 
 import type { VocabularyWord } from "@/features/vocabulary/types";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { vocabularyRoutePaths } from "@/features/vocabulary/routes/vocabularyRoutes";
 
 interface WordCardProps {
@@ -24,10 +30,6 @@ export default function WordCard({
 
   const usPhonetic = word.pronunciations?.us;
   const ukPhonetic = word.pronunciations?.uk;
-  const phoneticLabel =
-    [usPhonetic && `US: ${usPhonetic}`, ukPhonetic && `UK: ${ukPhonetic}`]
-      .filter(Boolean)
-      .join("  •  ") || "Chưa có phonetic.";
 
   const usAudioUrl = word.audioUrls?.us;
   const ukAudioUrl = word.audioUrls?.uk;
@@ -41,9 +43,21 @@ export default function WordCard({
             <CardTitle className="truncate text-lg font-semibold">
               {word.word}
             </CardTitle>
-            <p className="mt-1 text-sm text-muted-foreground">
-              {phoneticLabel}
-            </p>
+            <div className="mt-1 text-sm text-muted-foreground space-y-1">
+              {usPhonetic ? (
+                <p>
+                  <span className="font-medium">US:</span> {usPhonetic}
+                </p>
+              ) : null}
+
+              {ukPhonetic ? (
+                <p>
+                  <span className="font-medium">UK:</span> {ukPhonetic}
+                </p>
+              ) : null}
+
+              {!usPhonetic && !ukPhonetic ? <p>Chưa có phonetic.</p> : null}
+            </div>
           </div>
           <div className="rounded-full bg-primary/10 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.22em] text-primary">
             Word
@@ -87,7 +101,7 @@ export default function WordCard({
 
       <CardFooter className="flex flex-wrap gap-2 border-t border-border/60 px-5 py-4">
         <Button asChild variant="outline" size="sm">
-          <Link to={vocabularyRoutePaths.wordDetail(word._id)}>View</Link>
+          <Link to={vocabularyRoutePaths.wordDetail(word.slug)}>View</Link>
         </Button>
         <Button
           type="button"

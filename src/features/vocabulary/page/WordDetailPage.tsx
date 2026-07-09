@@ -15,8 +15,8 @@ import { vocabularyRoutePaths } from "@/features/vocabulary/routes/vocabularyRou
 
 export default function WordDetailPage() {
   const navigate = useNavigate();
-  const { wordId } = useParams<{ wordId: string }>();
-  const controller = useWordDetailController(wordId);
+  const { wordSlug } = useParams<{ wordSlug: string }>();
+  const controller = useWordDetailController(wordSlug);
   const [meaningToDelete, setMeaningToDelete] =
     useState<VocabularyMeaning | null>(null);
   const [shouldDeleteWord, setShouldDeleteWord] = useState(false);

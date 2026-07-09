@@ -17,7 +17,7 @@ import { validateLessonForm } from "@/features/vocabulary/schemas/vocabularySche
 interface LessonFormSheetProps {
   open: boolean;
   mode: "create" | "edit";
-  topicId: string;
+  topicSlug: string;
   topicName: string;
   lesson: VocabularyLesson | null;
   isSubmitting: boolean;
@@ -33,7 +33,7 @@ interface LessonFormSheetProps {
 export default function LessonFormSheet({
   open,
   mode,
-  topicId,
+  topicSlug,
   topicName,
   lesson,
   isSubmitting,
@@ -47,7 +47,7 @@ export default function LessonFormSheet({
     String(lesson?.estimatedTime ?? 0),
   );
   const [errors, setErrors] = useState<{
-    topicId?: string;
+    topicSlug?: string;
     title?: string;
     description?: string;
     thumbnail?: string;
@@ -58,7 +58,7 @@ export default function LessonFormSheet({
     event.preventDefault();
 
     const result = validateLessonForm({
-      topicId,
+      topicSlug,
       title,
       description,
       thumbnail,
@@ -105,8 +105,8 @@ export default function LessonFormSheet({
                   Lesson sẽ được gắn vào topic này.
                 </p>
               </div>
-              {errors.topicId ? (
-                <p className="text-xs text-destructive">{errors.topicId}</p>
+              {errors.topicSlug ? (
+                <p className="text-xs text-destructive">{errors.topicSlug}</p>
               ) : null}
             </div>
 

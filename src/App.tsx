@@ -7,6 +7,9 @@ import AdminLayout from "@/components/layout/AdminLayout";
 import AuthPage from "@/features/auth/AuthPage";
 import DashboardPage from "@/features/dashboard/DashboardPage";
 import OccupationPage from "@/features/occupation/OccupationPage";
+import GrammarPage from "@/features/grammar/page/GrammarPage";
+import GrammarTopicPage from "@/features/grammar/page/GrammarTopicPage";
+import GrammarTopicDetailPage from "@/features/grammar/page/GrammarTopicDetailPage";
 import LessonDetailPage from "@/features/vocabulary/page/LessonDetailPage";
 import TopicDetailPage from "@/features/vocabulary/page/TopicDetailPage";
 import TopicPage from "@/features/vocabulary/page/TopicPage";
@@ -74,10 +77,15 @@ function App() {
             <Route path="vocabulary" element={<VocabularyPage />}>
               <Route index element={<Navigate to="topics" replace />} />
               <Route path="topics" element={<TopicPage />} />
-              <Route path="topics/:topicId" element={<TopicDetailPage />} />
-              <Route path="lessons/:lessonId" element={<LessonDetailPage />} />
+              <Route path="topics/:topicSlug" element={<TopicDetailPage />} />
+              <Route path="lessons/:lessonSlug" element={<LessonDetailPage />} />
               <Route path="words" element={<WordPage />} />
-              <Route path="words/:wordId" element={<WordDetailPage />} />
+              <Route path="words/:wordSlug" element={<WordDetailPage />} />
+            </Route>
+            <Route path="grammar" element={<GrammarPage />}>
+              <Route index element={<Navigate to="topics" replace />} />
+              <Route path="topics" element={<GrammarTopicPage />} />
+              <Route path="topics/:topicSlug" element={<GrammarTopicDetailPage />} />
             </Route>
           </Route>
           <Route

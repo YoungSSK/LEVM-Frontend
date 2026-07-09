@@ -6,6 +6,7 @@ export interface VocabularyLesson {
   topicId: string;
 
   title: string;
+  slug: string;
   description: string;
   thumbnail: string;
 
@@ -97,53 +98,53 @@ interface ApiEnvelope<T> {
 }
 
 const vocabularyLessonApi = {
-  // GET /vocabulary-topics/:topicId/lessons
+  // GET /vocabulary-topics/:topicSlug/lessons
   getByTopic: (
-    topicId: string,
+    topicSlug: string,
   ): Promise<VocabularyLesson[]> =>
     axiosClient
       .get<ApiEnvelope<VocabularyLesson[]>>(
-        `/vocabulary-topics/${topicId}/lessons`,
+        `/vocabulary-topics/${topicSlug}/lessons`,
       )
       .then((res) => res.data.data),
 
-  // GET /vocabulary-lessons/:id
+  // GET /vocabulary-lessons/:lessonSlug
   getById: (
-    id: string,
+    lessonSlug: string,
   ): Promise<VocabularyLesson> =>
     axiosClient
       .get<ApiEnvelope<VocabularyLesson>>(
-        `/vocabulary-lessons/${id}`,
+        `/vocabulary-lessons/${lessonSlug}`,
       )
       .then((res) => res.data.data),
 
-  // POST /vocabulary-topics/:topicId/lessons
+  // POST /vocabulary-topics/:topicSlug/lessons
   create: (
-    topicId: string,
+    topicSlug: string,
     payload: CreateVocabularyLessonPayload,
   ): Promise<VocabularyLesson> =>
     axiosClient
       .post<ApiEnvelope<VocabularyLesson>>(
-        `/vocabulary-topics/${topicId}/lessons`,
+        `/vocabulary-topics/${topicSlug}/lessons`,
         payload,
       )
       .then((res) => res.data.data),
 
-  // PATCH /vocabulary-lessons/:id
+  // PATCH /vocabulary-lessons/:lessonSlug
   update: (
-    id: string,
+    lessonSlug: string,
     payload: UpdateVocabularyLessonPayload,
   ): Promise<VocabularyLesson> =>
     axiosClient
       .patch<ApiEnvelope<VocabularyLesson>>(
-        `/vocabulary-lessons/${id}`,
+        `/vocabulary-lessons/${lessonSlug}`,
         payload,
       )
       .then((res) => res.data.data),
 
-  // PATCH /vocabulary-lessons/:id/status
+  // PATCH /vocabulary-lessons/:lessonSlug/status
   changeStatus: (
-    id: string,
+    lessonSlug: string,
   ): Promise<{
     lessonId: string;
     isActive: boolean;
@@ -154,67 +155,67 @@ const vocabularyLessonApi = {
           lessonId: string;
           isActive: boolean;
         }>
-      >(`/vocabulary-lessons/${id}/status`)
+      >(`/vocabulary-lessons/${lessonSlug}/status`)
       .then((res) => res.data.data),
 
-  // DELETE /vocabulary-lessons/:id
-  delete: (id: string): Promise<void> =>
+  // DELETE /vocabulary-lessons/:lessonSlug
+  delete: (lessonSlug: string): Promise<void> =>
     axiosClient
-      .delete(`/vocabulary-lessons/${id}`)
+      .delete(`/vocabulary-lessons/${lessonSlug}`)
       .then(() => undefined),
 
-  // PATCH /vocabulary-topics/:topicId/lessons/order
+  // PATCH /vocabulary-topics/:topicSlug/lessons/order
   changeOrder: (
-    topicId: string,
+    topicSlug: string,
     orders: LessonOrderItem[],
   ): Promise<void> =>
     axiosClient
       .patch(
-        `/vocabulary-topics/${topicId}/lessons/order`,
+        `/vocabulary-topics/${topicSlug}/lessons/order`,
         { orders },
       )
       .then(() => undefined),
 
-  // GET /vocabulary-lessons/:lessonId/words
+  // GET /vocabulary-lessons/:lessonSlug/words
   getWords: (
-    lessonId: string,
+    lessonSlug: string,
   ): Promise<LessonWord[]> =>
     axiosClient
       .get<ApiEnvelope<LessonWord[]>>(
-        `/vocabulary-lessons/${lessonId}/words`,
+        `/vocabulary-lessons/${lessonSlug}/words`,
       )
       .then((res) => res.data.data),
 
-  // POST /vocabulary-lessons/:lessonId/words
+  // POST /vocabulary-lessons/:lessonSlug/words
   addWord: (
-    lessonId: string,
+    lessonSlug: string,
     payload: AddWordPayload,
   ): Promise<void> =>
     axiosClient
       .post(
-        `/vocabulary-lessons/${lessonId}/words`,
+        `/vocabulary-lessons/${lessonSlug}/words`,
         payload,
       )
       .then(() => undefined),
 
-  // DELETE /vocabulary-lessons/:lessonId/words/:wordId
+  // DELETE /vocabulary-lessons/:lessonSlug/words/:wordId
   removeWord: (
-    lessonId: string,
+    lessonSlug: string,
     wordId: string,
   ): Promise<void> =>
     axiosClient
       .delete(
-        `/vocabulary-lessons/${lessonId}/words/${wordId}`,
+        `/vocabulary-lessons/${lessonSlug}/words/${wordId}`,
       )
       .then(() => undefined),
 
-  // GET /vocabulary-lessons/:lessonId/study-words
+  // GET /vocabulary-lessons/:lessonSlug/study-words
   getStudyWords: (
-    lessonId: string,
+    lessonSlug: string,
   ): Promise<StudyWordResponse> =>
     axiosClient
       .get<ApiEnvelope<StudyWordResponse>>(
-        `/vocabulary-lessons/${lessonId}/study-words`,
+        `/vocabulary-lessons/${lessonSlug}/study-words`,
       )
       .then((res) => res.data.data),
 };

@@ -26,8 +26,8 @@ function LessonWordTableSkeleton() {
 }
 
 export default function LessonDetailPage() {
-  const { lessonId } = useParams<{ lessonId: string }>();
-  const controller = useLessonDetailController(lessonId);
+  const { lessonSlug } = useParams<{ lessonSlug: string }>();
+  const controller = useLessonDetailController(lessonSlug);
   const [relationToDelete, setRelationToDelete] =
     useState<VocabularyLessonWordRelation | null>(null);
 
@@ -36,7 +36,7 @@ export default function LessonDetailPage() {
       <Link
         to={
           controller.topic
-            ? vocabularyRoutePaths.topicDetail(controller.topic._id)
+            ? vocabularyRoutePaths.topicDetail(controller.topic.slug)
             : vocabularyRoutePaths.topics
         }
         className="inline-flex items-center gap-1 text-sm font-medium text-muted-foreground hover:text-foreground"
@@ -81,8 +81,8 @@ export default function LessonDetailPage() {
               </div>
             </div>
 
-            <div className="grid gap-4 md:grid-cols-[minmax(0,1fr)_18rem]">
-              <div className="rounded-2xl border border-border bg-background p-3">
+            <div className="flex flex-col gap-4 md:flex-row">
+              <div className="shrink-0 w-full md:w-64 lg:w-80 rounded-2xl border border-border bg-background p-2">
                 {controller.lesson.thumbnail ? (
                   <img
                     src={controller.lesson.thumbnail}
@@ -96,7 +96,7 @@ export default function LessonDetailPage() {
                 )}
               </div>
 
-              <div className="space-y-3 rounded-2xl border border-border bg-muted/40 px-4 py-3">
+              <div className="flex-1 space-y-3 rounded-2xl border border-border bg-muted/40 px-5 py-4">
                 <div>
                   <p className="text-[11px] uppercase tracking-[0.22em] text-muted-foreground">
                     Topic
@@ -118,7 +118,7 @@ export default function LessonDetailPage() {
                     Status
                   </p>
                   <p className="mt-1 font-medium text-foreground">
-                    {controller.lesson.isPublished ? "Published" : "Draft"}
+                    {controller.lesson.isActive ? "Published" : "Draft"}
                   </p>
                 </div>
               </div>

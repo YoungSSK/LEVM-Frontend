@@ -18,12 +18,13 @@ import {
   sortWordsByLabel,
 } from "@/features/vocabulary/hooks/vocabularyHookUtils";
 
-export function useLessonDetailController(lessonId?: string) {
+export function useLessonDetailController(lessonSlug?: string) {
   const [topic, setTopic] = useState<VocabularyTopic | null>(null);
   const [availableWords, setAvailableWords] = useState<VocabularyWord[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [isAddWordModalOpen, setIsAddWordModalOpen] = useState(false);
   const [isLoadingWords, setIsLoadingWords] = useState(false);
+  const [isSavingRelation, setIsSavingRelation] = useState(false);
 
   const {
     selectedLesson: lesson,
@@ -40,17 +41,17 @@ export function useLessonDetailController(lessonId?: string) {
   const wordsRequestRef = useRef(0);
 
   const loadLessonData = useCallback(async () => {
-    if (!lessonId) return;
+    if (!lessonSlug) return;
     try {
-      await fetchLessonById(lessonId);
-      await fetchLessonWords(lessonId);
+      await fetchLessonById(lessonSlug);
+      await fetchLessonWords(lessonSlug);
     } catch (loadError) {
       toast.error(getErrorMessage(loadError));
     }
-  }, [lessonId, fetchLessonById, fetchLessonWords]);
+  }, [lessonSlug, fetchLessonById, fetchLessonWords]);
 
-  const loadTopic = useCallback(async (topicId?: string) => {
-    if (!topicId) {
+  const loadTopic = useCallback(async (nextTopicSlug?: string) => {
+    if (!nextTopicSlug) {
       setTopic(null);
       return;
     }
@@ -58,7 +59,7 @@ export function useLessonDetailController(lessonId?: string) {
     const requestId = ++topicRequestRef.current;
 
     try {
-      const nextTopic = await vocabularyTopicApi.getById(topicId);
+      const nextTopic = await vocabularyTopicApi.getById(nextTopicSlug);
 
       if (requestId !== topicRequestRef.current) return;
 
@@ -108,7 +109,7 @@ export function useLessonDetailController(lessonId?: string) {
       void loadAvailableWords();
     }, 0);
     return () => clearTimeout(timer);
-  }, [lessonId, loadLessonData, loadAvailableWords]);
+  }, [lessonSlug, loadLessonData, loadAvailableWords]);
 
   useEffect(() => {
     if (!lesson?.topicId) return;
@@ -135,8 +136,9 @@ export function useLessonDetailController(lessonId?: string) {
   const addWordToLesson = async (payload: AddWordToLessonPayload) => {
     if (!lesson) return;
 
+    setIsSavingRelation(true);
     try {
-      await addWord(lesson._id, {
+      await addWord(lesson.slug, {
         wordId: payload.wordId,
         wordMeaningId: payload.meaningId,
       });
@@ -146,6 +148,8 @@ export function useLessonDetailController(lessonId?: string) {
       await loadLessonData();
     } catch (saveError) {
       toast.error(getErrorMessage(saveError));
+    } finally {
+      setIsSavingRelation(false);
     }
   };
 
@@ -162,7 +166,7 @@ export function useLessonDetailController(lessonId?: string) {
     }
 
     try {
-      await removeWord(lesson._id, relation.wordId);
+      await removeWord(lesson.slug, relation.wordId);
       toast.success("Đã xóa word khỏi lesson.");
 
       await loadLessonData();
@@ -200,12 +204,14 @@ export function useLessonDetailController(lessonId?: string) {
     lesson,
     topic,
     lessonWords: sortLessonRelations(lessonWords),
-    availableWords,
+    availableWords: availableWords.filter(
+      (word) => !lessonWords.some((lw) => lw.wordId === word._id)
+    ),
     error: error || lessonStoreError,
     isLoadingLesson,
     isLoadingWords,
     isLoadingLessonWords: isLoadingLesson,
-    isSavingRelation: false,
+    isSavingRelation,
     isAddWordModalOpen,
     openAddWordModal,
     closeAddWordModal,
