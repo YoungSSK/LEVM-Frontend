@@ -4,7 +4,7 @@ import { Plus, Search } from "lucide-react";
 import ConfirmDeleteDialog from "@/features/vocabulary/components/ConfirmDeleteDialog";
 import PaginationBar from "@/features/vocabulary/components/PaginationBar";
 import WordCard from "@/features/vocabulary/components/WordCard";
-import WordFormSheet from "@/features/vocabulary/components/WordFormSheet";
+import WordFormDialog from "@/features/vocabulary/components/WordFormDialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -101,7 +101,7 @@ export default function WordPage() {
       />
 
       {isEditorOpen ? (
-        <WordFormSheet
+        <WordFormDialog
           key={
             controller.wordEditor?.mode === "edit"
               ? `edit-${controller.wordEditor.word._id}`

@@ -4,7 +4,7 @@ import { Plus, Search } from "lucide-react";
 import ConfirmDeleteDialog from "@/features/vocabulary/components/ConfirmDeleteDialog";
 import PaginationBar from "@/features/vocabulary/components/PaginationBar";
 import TopicCard from "@/features/vocabulary/components/TopicCard";
-import TopicFormSheet from "@/features/vocabulary/components/TopicFormSheet";
+import TopicFormDialog from "@/features/vocabulary/components/TopicFormDialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -104,7 +104,7 @@ export default function TopicPage() {
       />
 
       {isEditorOpen ? (
-        <TopicFormSheet
+        <TopicFormDialog
           key={
             controller.topicEditor?.mode === "edit"
               ? `edit-${controller.topicEditor.topic._id}`

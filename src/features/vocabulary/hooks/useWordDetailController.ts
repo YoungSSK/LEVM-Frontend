@@ -1,9 +1,10 @@
 /* eslint-disable react-hooks/set-state-in-effect */
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 
 import { useWordStore } from "@/stores/wordStore";
 import { useWordMeaningStore } from "@/stores/wordMeaningStore";
+import type { WordMeaning } from "@/api/wordMeaningApi";
 import type {
   VocabularyMeaning,
   VocabularyWord,
@@ -11,6 +12,8 @@ import type {
 } from "@/features/vocabulary/types";
 
 import { getErrorMessage } from "@/features/vocabulary/hooks/vocabularyHookUtils";
+
+type PartOfSpeech = WordMeaning["partOfSpeech"];
 
 type MeaningEditorState =
   | { mode: "create" }
@@ -53,50 +56,60 @@ export function useWordDetailController(wordSlug?: string) {
   const wordRequestRef = useRef(0);
   const meaningRequestRef = useRef(0);
 
-  const loadWord = async (nextWordSlug?: string) => {
-    const currentWordSlug = nextWordSlug ?? wordSlug;
+  const loadWord = useCallback(
+    async (nextWordSlug?: string) => {
+      const currentWordSlug = nextWordSlug ?? wordSlug;
 
-    if (!currentWordSlug) {
-      setError("Thiếu wordSlug.");
-      return;
-    }
+      if (!currentWordSlug) {
+        setError("Thiếu wordSlug.");
+        return;
+      }
 
-    const requestId = ++wordRequestRef.current;
+      const requestId = ++wordRequestRef.current;
 
-    try {
-      await fetchWordById(currentWordSlug);
-    } catch (loadError) {
-      if (requestId !== wordRequestRef.current) return;
-      const message = getErrorMessage(loadError);
-      setError(message);
-      toast.error(message);
-    }
-  };
+      try {
+        await fetchWordById(currentWordSlug);
+      } catch (loadError) {
+        if (requestId !== wordRequestRef.current) return;
+        const message = getErrorMessage(loadError);
+        setError(message);
+        toast.error(message);
+      }
+    },
+    [wordSlug, fetchWordById],
+  );
 
-  const loadMeanings = async (nextWordSlug?: string) => {
-    const currentWordSlug = nextWordSlug ?? wordSlug;
+  const loadMeanings = useCallback(
+    async (nextWordSlug?: string) => {
+      const currentWordSlug = nextWordSlug ?? wordSlug;
 
-    if (!currentWordSlug) {
-      return;
-    }
+      if (!currentWordSlug) {
+        return;
+      }
 
-    const requestId = ++meaningRequestRef.current;
+      const requestId = ++meaningRequestRef.current;
 
-    try {
-      await fetchByWord(currentWordSlug);
-    } catch (loadError) {
-      if (requestId !== meaningRequestRef.current) return;
-      const message = getErrorMessage(loadError);
-      setError(message);
-      toast.error(message);
-    }
-  };
+      try {
+        await fetchByWord(currentWordSlug);
+      } catch (loadError) {
+        if (requestId !== meaningRequestRef.current) return;
+        const message = getErrorMessage(loadError);
+        setError(message);
+        toast.error(message);
+      }
+    },
+    [wordSlug, fetchByWord],
+  );
 
   useEffect(() => {
     setError(null);
+    if (!wordSlug) {
+      setError("Thiếu wordSlug.");
+      return;
+    }
     void loadWord();
     void loadMeanings();
-  }, [wordSlug]);
+  }, [wordSlug, loadWord, loadMeanings]);
 
   const openCreateMeaning = () => {
     if (!word) {
@@ -135,10 +148,10 @@ export function useWordDetailController(wordSlug?: string) {
     }
 
     try {
-      await updateWordInStore(word._id, payload);
+      await updateWordInStore(word.slug, payload);
       toast.success("Đã cập nhật word.");
       closeWordEditor();
-      await Promise.all([loadWord(word._id), loadMeanings(word._id)]);
+      await Promise.all([loadWord(word.slug), loadMeanings(word.slug)]);
     } catch (saveError) {
       toast.error(getErrorMessage(saveError));
     }
@@ -151,7 +164,7 @@ export function useWordDetailController(wordSlug?: string) {
     }
 
     try {
-      await removeWordInStore(word._id);
+      await removeWordInStore(word.slug);
       toast.success("Đã xóa word.");
       return true;
     } catch (deleteError) {
@@ -168,15 +181,15 @@ export function useWordDetailController(wordSlug?: string) {
 
     try {
       if (meaningEditor?.mode === "edit") {
-        await updateMeaning(word._id, meaningEditor.meaning._id, {
-          partOfSpeech: payload.partOfSpeech as any,
+        await updateMeaning(word.slug, meaningEditor.meaning._id, {
+          partOfSpeech: payload.partOfSpeech as PartOfSpeech,
           meaning: payload.meaning,
           exampleSentence: payload.example,
         });
         toast.success("Đã cập nhật meaning.");
       } else {
-        await createMeaning(word._id, {
-          partOfSpeech: payload.partOfSpeech as any,
+        await createMeaning(word.slug, {
+          partOfSpeech: payload.partOfSpeech as PartOfSpeech,
           meaning: payload.meaning,
           exampleSentence: payload.example,
         });
@@ -184,7 +197,7 @@ export function useWordDetailController(wordSlug?: string) {
       }
 
       closeMeaningEditor();
-      await Promise.all([loadWord(word._id), loadMeanings(word._id)]);
+      await Promise.all([loadWord(word.slug), loadMeanings(word.slug)]);
     } catch (saveError) {
       toast.error(getErrorMessage(saveError));
     }
@@ -193,9 +206,9 @@ export function useWordDetailController(wordSlug?: string) {
   const deleteMeaning = async (meaning: VocabularyMeaning) => {
     if (!word) return;
     try {
-      await removeMeaning(word._id, meaning._id);
+      await removeMeaning(word.slug, meaning._id);
       toast.success("Đã xóa meaning.");
-      await Promise.all([loadWord(word._id), loadMeanings(word._id)]);
+      await Promise.all([loadWord(word.slug), loadMeanings(word.slug)]);
     } catch (deleteError) {
       toast.error(getErrorMessage(deleteError));
     }

@@ -121,9 +121,9 @@ const wordApi = {
       .get<ApiEnvelope<Word>>(`/words/${wordSlug}`)
       .then((res) => res.data.data),
 
-  getDetail: (wordSlug: string): Promise<any> =>
+  getDetail: (wordSlug: string): Promise<unknown> =>
     axiosClient
-      .get<ApiEnvelope<any>>(`/words/${wordSlug}/detail`)
+      .get<ApiEnvelope<unknown>>(`/words/${wordSlug}/detail`)
       .then((res) => res.data.data),
 
   create: (payload: CreateWordPayload): Promise<Word> =>

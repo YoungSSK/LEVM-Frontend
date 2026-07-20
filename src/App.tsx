@@ -80,8 +80,8 @@ function App() {
               <Route path="topics/:topicSlug" element={<TopicDetailPage />} />
               <Route path="lessons/:lessonSlug" element={<LessonDetailPage />} />
               <Route path="words" element={<WordPage />} />
-              <Route path="words/:wordSlug" element={<WordDetailPage />} />
             </Route>
+            <Route path="vocabulary/words/:wordSlug" element={<WordDetailPage />} />
             <Route path="grammar" element={<GrammarPage />}>
               <Route index element={<Navigate to="topics" replace />} />
               <Route path="topics" element={<GrammarTopicPage />} />

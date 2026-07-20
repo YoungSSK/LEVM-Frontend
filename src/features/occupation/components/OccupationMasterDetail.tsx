@@ -5,9 +5,9 @@ import { useOccupationPageController } from "@/features/occupation/hooks/useOccu
 import type { OccupationCategory } from "@/api/occupationCategoryApi";
 import ConfirmDeleteDialog from "@/features/vocabulary/components/ConfirmDeleteDialog";
 import OccupationCategoryPanel from "@/features/occupation/components/OccupationCategoryPanel";
-import OccupationCategorySheet from "@/features/occupation/components/OccupationCategorySheet";
+import OccupationCategoryDialog from "@/features/occupation/components/OccupationCategoryDialog";
 import OccupationOccupationPanel from "@/features/occupation/components/OccupationOccupationPanel";
-import OccupationOccupationSheet from "@/features/occupation/components/OccupationOccupationSheet";
+import OccupationOccupationDialog from "@/features/occupation/components/OccupationOccupationDialog";
 
 export default function OccupationMasterDetail() {
   const controller = useOccupationPageController();
@@ -90,7 +90,7 @@ export default function OccupationMasterDetail() {
       </div>
 
       {isCategorySheetOpen ? (
-        <OccupationCategorySheet
+        <OccupationCategoryDialog
           key={
             controller.categoryEditor?.mode === "edit"
               ? `edit-${controller.categoryEditor.category._id}`
@@ -119,7 +119,7 @@ export default function OccupationMasterDetail() {
       ) : null}
 
       {isOccupationSheetOpen ? (
-        <OccupationOccupationSheet
+        <OccupationOccupationDialog
           key={
             controller.occupationEditor?.mode === "edit"
               ? `edit-${controller.occupationEditor.occupation._id}`

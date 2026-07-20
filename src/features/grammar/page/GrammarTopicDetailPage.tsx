@@ -4,7 +4,7 @@ import { Link, useParams } from "react-router-dom";
 
 import ConfirmDeleteDialog from "@/features/vocabulary/components/ConfirmDeleteDialog";
 import GrammarLessonCard from "@/features/grammar/components/GrammarLessonCard";
-import GrammarLessonFormSheet from "@/features/grammar/components/GrammarLessonFormSheet";
+import GrammarLessonFormDialog from "@/features/grammar/components/GrammarLessonFormDialog";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -174,7 +174,7 @@ export default function GrammarTopicDetailPage() {
       )}
 
       {isEditorOpen && controller.topic ? (
-        <GrammarLessonFormSheet
+        <GrammarLessonFormDialog
           key={
             controller.lessonEditor?.mode === "edit"
               ? `edit-${controller.lessonEditor.lesson._id}`

@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/set-state-in-effect */
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
 
 import { useGrammarTopicStore } from "@/stores/GrammarTopicStore";
@@ -52,17 +52,17 @@ export function useGrammarTopicsController() {
 
   const pageSize = 6;
 
-  const loadTopics = async () => {
+  const loadTopics = useCallback(async () => {
     try {
       await fetchAll(1, 1000);
     } catch (loadError) {
       toast.error(getErrorMessage(loadError));
     }
-  };
+  }, [fetchAll]);
 
   useEffect(() => {
     void loadTopics();
-  }, []);
+  }, [loadTopics]);
 
   useEffect(() => {
     setPage(1);

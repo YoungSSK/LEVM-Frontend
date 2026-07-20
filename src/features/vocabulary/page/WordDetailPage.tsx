@@ -3,9 +3,9 @@ import { ArrowLeft, Pencil, Plus, Trash2 } from "lucide-react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 
 import ConfirmDeleteDialog from "@/features/vocabulary/components/ConfirmDeleteDialog";
-import MeaningFormSheet from "@/features/vocabulary/components/MeaningFormSheet";
+import MeaningFormDialog from "@/features/vocabulary/components/MeaningFormDialog";
 import MeaningList from "@/features/vocabulary/components/MeaningList";
-import WordFormSheet from "@/features/vocabulary/components/WordFormSheet";
+import WordFormDialog from "@/features/vocabulary/components/WordFormDialog";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -169,7 +169,7 @@ export default function WordDetailPage() {
       ) : null}
 
       {isWordEditorOpen && controller.word ? (
-        <WordFormSheet
+        <WordFormDialog
           key={`edit-${controller.wordEditor?.word._id ?? controller.word._id}`}
           open={isWordEditorOpen}
           mode="edit"
@@ -185,7 +185,7 @@ export default function WordDetailPage() {
       ) : null}
 
       {isMeaningEditorOpen && controller.word ? (
-        <MeaningFormSheet
+        <MeaningFormDialog
           key={
             controller.meaningEditor?.mode === "edit"
               ? `edit-${controller.meaningEditor.meaning._id}`

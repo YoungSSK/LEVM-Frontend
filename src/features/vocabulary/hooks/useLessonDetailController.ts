@@ -74,7 +74,8 @@ export function useLessonDetailController(lessonSlug?: string) {
     }
   }, []);
 
-  const loadAvailableWords = useCallback(async () => {
+  const loadAvailableWords = 
+  useCallback(async () => {
      setIsLoadingWords(true);
     const requestId = ++wordsRequestRef.current;
 
@@ -186,6 +187,7 @@ export function useLessonDetailController(lessonSlug?: string) {
       meaningId: meaningObj ? meaningObj._id : (w.wordMeaningId as string),
       word: wordObj ? {
         _id: wordObj._id,
+        slug: wordObj.slug,
         word: wordObj.word,
         pronunciations: wordObj.pronunciations,
         audioUrls: wordObj.audioUrls,

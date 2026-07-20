@@ -18,6 +18,7 @@ export interface VocabularyLessonWordRelation {
   meaningId: string;
   word?: {
     _id: string;
+    slug: string;
     word: string;
     pronunciations?: {
       us: string;

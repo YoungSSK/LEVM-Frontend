@@ -1,9 +1,10 @@
 /* eslint-disable react-hooks/set-state-in-effect */
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 
 import wordApi from "@/api/wordApi";
 import wordMeaningApi from "@/api/wordMeaningApi";
+import type { WordMeaning } from "@/api/wordMeaningApi";
 import type {
   CreateVocabularyWordPayload,
   UpdateVocabularyWordPayload,
@@ -14,6 +15,16 @@ import {
   getErrorMessage,
   sortWordsByLabel,
 } from "@/features/vocabulary/hooks/vocabularyHookUtils";
+
+type PartOfSpeech = WordMeaning["partOfSpeech"];
+
+type DictionaryPhonetic = {
+  audio?: string;
+};
+
+type DictionaryEntry = {
+  phonetics?: DictionaryPhonetic[];
+};
 
 type WordEditorState =
   | { mode: "create" }
@@ -53,7 +64,7 @@ export function useWordsController() {
     currentPage * pageSize,
   );
 
-  const loadWords = async () => {
+  const loadWords = useCallback(async () => {
     const requestId = ++requestRef.current;
     setIsLoading(true);
     setError(null);
@@ -83,11 +94,11 @@ export function useWordsController() {
         setIsLoading(false);
       }
     }
-  };
+  }, []);
 
   useEffect(() => {
     void loadWords();
-  }, []);
+  }, [loadWords]);
 
   useEffect(() => {
     setPage(1);
@@ -120,7 +131,8 @@ export function useWordsController() {
         const createdWord = await wordApi.create({
           word: createPayload.word,
           meaning: createPayload.meanings?.[0]?.meaning || "",
-          partOfSpeech: (createPayload.meanings?.[0]?.partOfSpeech || "noun") as any,
+          partOfSpeech: (createPayload.meanings?.[0]?.partOfSpeech ||
+            "noun") as PartOfSpeech,
         });
 
         // Add secondary meanings if any
@@ -128,7 +140,7 @@ export function useWordsController() {
           for (let i = 1; i < createPayload.meanings.length; i++) {
             const meaning = createPayload.meanings[i];
             await wordMeaningApi.create(createdWord.slug, {
-              partOfSpeech: meaning.partOfSpeech as any,
+              partOfSpeech: meaning.partOfSpeech as PartOfSpeech,
               meaning: meaning.meaning,
               exampleSentence: meaning.exampleSentence,
             });
@@ -151,11 +163,19 @@ export function useWordsController() {
     try {
       const res = await fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${encodeURIComponent(payload.word)}`);
       if (!res.ok) throw new Error("Không tìm thấy audio trên từ điển.");
-      const data = await res.json();
+      const data = (await res.json()) as DictionaryEntry[];
       const phonetics = data[0]?.phonetics || [];
-      const usPhonetic = phonetics.find((item: any) => item.audio && item.audio.toLowerCase().includes("-us.mp3"));
-      const ukPhonetic = phonetics.find((item: any) => item.audio && item.audio.toLowerCase().includes("-uk.mp3"));
-      const audioUrl = usPhonetic?.audio || ukPhonetic?.audio || phonetics.find((item: any) => item.audio)?.audio || "";
+      const usPhonetic = phonetics.find(
+        (item: DictionaryPhonetic) => item.audio && item.audio.toLowerCase().includes("-us.mp3"),
+      );
+      const ukPhonetic = phonetics.find(
+        (item: DictionaryPhonetic) => item.audio && item.audio.toLowerCase().includes("-uk.mp3"),
+      );
+      const audioUrl =
+        usPhonetic?.audio ||
+        ukPhonetic?.audio ||
+        phonetics.find((item: DictionaryPhonetic) => item.audio)?.audio ||
+        "";
       if (!audioUrl) throw new Error("Không có audio cho từ này.");
       return audioUrl;
     } catch (e) {
@@ -166,7 +186,7 @@ export function useWordsController() {
 
   const deleteWord = async (word: VocabularyWord) => {
     try {
-      await wordApi.remove(word._id);
+      await wordApi.remove(word.slug);
       toast.success("Đã xóa word.");
 
       if (wordEditor?.mode === "edit" && wordEditor.word._id === word._id) {

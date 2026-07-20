@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/set-state-in-effect */
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 
 import grammarTopicApi from "@/api/grammarTopicApi";
@@ -47,7 +47,7 @@ export function useGrammarTopicDetailController(topicSlug?: string) {
 
   const topicRequestRef = useRef(0);
 
-  const loadTopic = async (nextTopicSlug?: string) => {
+  const loadTopic = useCallback(async (nextTopicSlug?: string) => {
     const currentTopicSlug = nextTopicSlug ?? topicSlug;
 
     if (!currentTopicSlug) {
@@ -77,9 +77,9 @@ export function useGrammarTopicDetailController(topicSlug?: string) {
         setIsLoadingTopic(false);
       }
     }
-  };
+  }, [topicSlug]);
 
-  const loadLessons = async () => {
+  const loadLessons = useCallback(async () => {
     if (!topic) return;
 
     setIsLoadingLessons(true);
@@ -92,18 +92,18 @@ export function useGrammarTopicDetailController(topicSlug?: string) {
     } finally {
       setIsLoadingLessons(false);
     }
-  };
+  }, [topic]);
 
   useEffect(() => {
     setError(null);
     void loadTopic();
-  }, [topicSlug]);
+  }, [loadTopic]);
 
   useEffect(() => {
     if (topic) {
       void loadLessons();
     }
-  }, [topic?._id]);
+  }, [loadLessons, topic]);
 
   const openCreateLesson = () => {
     if (!topic) {

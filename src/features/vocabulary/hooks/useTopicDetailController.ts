@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/set-state-in-effect */
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 
 import vocabularyTopicApi from "@/api/vocabularyTopicApi";
@@ -41,57 +41,63 @@ export function useTopicDetailController(topicSlug?: string) {
 
   const topicRequestRef = useRef(0);
 
-  const loadTopic = async (nextTopicSlug?: string) => {
-    const currentTopicSlug = nextTopicSlug ?? topicSlug;
+  const loadTopic = useCallback(
+    async (nextTopicSlug?: string) => {
+      const currentTopicSlug = nextTopicSlug ?? topicSlug;
 
-    if (!currentTopicSlug) {
-      setTopic(null);
-      setError("Thiếu topicSlug.");
-      return;
-    }
-
-    const requestId = ++topicRequestRef.current;
-    setIsLoadingTopic(true);
-
-    try {
-      const nextTopic = await vocabularyTopicApi.getById(currentTopicSlug);
-
-      if (requestId !== topicRequestRef.current) return;
-
-      setTopic(nextTopic);
-    } catch (loadError) {
-      if (requestId !== topicRequestRef.current) return;
-
-      const message = getErrorMessage(loadError);
-      setTopic(null);
-      setError(message);
-      toast.error(message);
-    } finally {
-      if (requestId === topicRequestRef.current) {
-        setIsLoadingTopic(false);
+      if (!currentTopicSlug) {
+        setTopic(null);
+        setError("Thiếu topicSlug.");
+        return;
       }
-    }
-  };
 
-  const loadLessons = async (nextTopicSlug?: string) => {
-    const currentTopicSlug = nextTopicSlug ?? topicSlug;
+      const requestId = ++topicRequestRef.current;
+      setIsLoadingTopic(true);
 
-    if (!currentTopicSlug) {
-      return;
-    }
+      try {
+        const nextTopic = await vocabularyTopicApi.getById(currentTopicSlug);
 
-    try {
-      await fetchByTopic(currentTopicSlug);
-    } catch (loadError) {
-      toast.error(getErrorMessage(loadError));
-    }
-  };
+        if (requestId !== topicRequestRef.current) return;
+
+        setTopic(nextTopic);
+      } catch (loadError) {
+        if (requestId !== topicRequestRef.current) return;
+
+        const message = getErrorMessage(loadError);
+        setTopic(null);
+        setError(message);
+        toast.error(message);
+      } finally {
+        if (requestId === topicRequestRef.current) {
+          setIsLoadingTopic(false);
+        }
+      }
+    },
+    [topicSlug],
+  );
+
+  const loadLessons = useCallback(
+    async (nextTopicSlug?: string) => {
+      const currentTopicSlug = nextTopicSlug ?? topicSlug;
+
+      if (!currentTopicSlug) {
+        return;
+      }
+
+      try {
+        await fetchByTopic(currentTopicSlug);
+      } catch (loadError) {
+        toast.error(getErrorMessage(loadError));
+      }
+    },
+    [topicSlug, fetchByTopic],
+  );
 
   useEffect(() => {
     setError(null);
     void loadTopic();
     void loadLessons();
-  }, [topicSlug]);
+  }, [loadTopic, loadLessons]);
 
   const openCreateLesson = () => {
     if (!topic) {
@@ -118,7 +124,8 @@ export function useTopicDetailController(topicSlug?: string) {
       return;
     }
 
-    const rawPayload = payload as any;
+    const rawPayload = payload as CreateVocabularyLessonPayload &
+      UpdateVocabularyLessonPayload;
     const cleanPayload = {
       title: rawPayload.title ?? "",
       description: rawPayload.description,

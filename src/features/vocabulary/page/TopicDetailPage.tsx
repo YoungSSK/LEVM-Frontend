@@ -4,7 +4,7 @@ import { Link, useParams } from "react-router-dom";
 
 import ConfirmDeleteDialog from "@/features/vocabulary/components/ConfirmDeleteDialog";
 import LessonCard from "@/features/vocabulary/components/LessonCard";
-import LessonFormSheet from "@/features/vocabulary/components/LessonFormSheet";
+import LessonFormDialog from "@/features/vocabulary/components/LessonFormDialog";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -143,7 +143,7 @@ export default function TopicDetailPage() {
       ) : null}
 
       {isEditorOpen && controller.topic ? (
-        <LessonFormSheet
+        <LessonFormDialog
           key={
             controller.lessonEditor?.mode === "edit"
               ? `edit-${controller.lessonEditor.lesson._id}`

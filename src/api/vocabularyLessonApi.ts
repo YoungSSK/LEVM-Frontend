@@ -30,8 +30,8 @@ export interface LessonWord {
   _id: string;
   lessonId: string;
 
-  wordId: any;
-  wordMeaningId: any;
+  wordId: string;
+  wordMeaningId: string;
 }
 
 export interface StudyWordResponse {

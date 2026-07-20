@@ -4,7 +4,7 @@ import { Plus, Search } from "lucide-react";
 import ConfirmDeleteDialog from "@/features/vocabulary/components/ConfirmDeleteDialog";
 import PaginationBar from "@/features/vocabulary/components/PaginationBar";
 import GrammarTopicCard from "@/features/grammar/components/GrammarTopicCard";
-import GrammarTopicFormSheet from "@/features/grammar/components/GrammarTopicFormSheet";
+import GrammarTopicFormDialog from "@/features/grammar/components/GrammarTopicFormDialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -102,7 +102,7 @@ export default function GrammarTopicPage() {
       />
 
       {isEditorOpen ? (
-        <GrammarTopicFormSheet
+        <GrammarTopicFormDialog
           key={
             controller.topicEditor?.mode === "edit"
               ? `edit-${controller.topicEditor.topic._id}`

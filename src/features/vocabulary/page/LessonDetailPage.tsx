@@ -181,7 +181,7 @@ export default function LessonDetailPage() {
                   <tr key={`${relation.lessonId}-${relation.wordId}-${relation.meaningId}`}>
                     <td className="px-4 py-4 text-sm font-medium text-foreground">
                       <Link
-                        to={vocabularyRoutePaths.wordDetail(relation.wordId)}
+                        to={vocabularyRoutePaths.wordDetail(relation.word?.slug as string)}
                         className="hover:text-primary"
                       >
                         {relation.word?.word ?? "Unknown word"}

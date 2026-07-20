@@ -3,20 +3,30 @@ import axiosClient from "@/api/axiosClient";
 export interface UserProfile {
   _id: string;
   email: string;
+  username?: string;
   role: string;
   displayName?: string;
-  avatarUrl?: string;
+  avatar?: {
+    publicId: string | null;
+    secureUrl: string | null;
+  };
+  bio?: string;
+  occupationId?: string | null;
+  streak?: number;
+  xp?: number;
+  createdAt?: string;
+  updatedAt?: string;
   [key: string]: unknown;
 }
 
 export interface UpdateProfilePayload {
   displayName?: string;
-  avatarUrl?: string;
-  [key: string]: unknown;
+  bio?: string;
+  occupationId?: string | null;
 }
 
 export interface ChangePasswordPayload {
-  currentPassword: string;
+  oldPassword: string;
   newPassword: string;
 }
 
@@ -38,6 +48,23 @@ const userApi = {
     axiosClient
       .patch<ApiEnvelope<UserProfile>>("/users/me", payload)
       .then((res) => res.data.data),
+
+  // PATCH /api/users/avatar
+  uploadAvatar: (file: File): Promise<{ publicId: string; secureUrl: string }> => {
+    const formData = new FormData();
+    formData.append("avatar", file);
+    return axiosClient
+      .patch<ApiEnvelope<{ publicId: string; secureUrl: string }>>(
+        "/users/avatar",
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        },
+      )
+      .then((res) => res.data.data);
+  },
 
   // PATCH /api/users/change-password
   changePassword: (payload: ChangePasswordPayload): Promise<void> =>
