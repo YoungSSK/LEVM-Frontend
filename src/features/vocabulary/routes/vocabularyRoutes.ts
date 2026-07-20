@@ -3,11 +3,11 @@ import { BookOpenText, LayoutGrid } from "lucide-react";
 export const vocabularyRoutePaths = {
   root: "/vocabulary",
   topics: "/vocabulary/topics",
-  topicDetail: (topicId: string) => `/vocabulary/topics/${topicId}`,
+  topicDetail: (topicSlug: string) => `/vocabulary/topics/${topicSlug}`,
   lessons: "/vocabulary/lessons",
-  lessonDetail: (lessonId: string) => `/vocabulary/lessons/${lessonId}`,
+  lessonDetail: (lessonSlug: string) => `/vocabulary/lessons/${lessonSlug}`,
   words: "/vocabulary/words",
-  wordDetail: (wordId: string) => `/vocabulary/words/${wordId}`,
+  wordDetail: (wordSlug: string) => `/vocabulary/words/${wordSlug}`,
 } as const;
 
 export const vocabularyNavigationItems = [

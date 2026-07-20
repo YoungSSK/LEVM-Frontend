@@ -2,23 +2,38 @@
 import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
 
-import { useVocabularyTopicStore } from "@/stores/VocabularyTopicStore";
-import type {
-  CreateVocabularyTopicPayload,
-  UpdateVocabularyTopicPayload,
-  VocabularyTopic,
-} from "@/features/vocabulary/types";
+import { useGrammarTopicStore } from "@/stores/GrammarTopicStore";
+import type { GrammarTopic } from "@/features/grammar/types";
 
-import {
-  getErrorMessage,
-  sortByOrderThenLabel,
-} from "@/features/vocabulary/hooks/vocabularyHookUtils";
+function getErrorMessage(error: unknown) {
+  return error instanceof Error
+    ? error.message
+    : "Lỗi hệ thống, vui lòng thử lại sau.";
+}
+
+function sortByOrderThenLabel<T extends { order?: number; name?: string }>(
+  items: T[],
+) {
+  return [...items].sort((a, b) => {
+    const orderDelta =
+      (a.order ?? Number.MAX_SAFE_INTEGER) -
+      (b.order ?? Number.MAX_SAFE_INTEGER);
+
+    if (orderDelta !== 0) {
+      return orderDelta;
+    }
+
+    const labelA = a.name ?? "";
+    const labelB = b.name ?? "";
+    return labelA.localeCompare(labelB);
+  });
+}
 
 type TopicEditorState =
   | { mode: "create" }
-  | { mode: "edit"; topic: VocabularyTopic };
+  | { mode: "edit"; topic: GrammarTopic };
 
-export function useTopicsController() {
+export function useGrammarTopicsController() {
   const {
     topics: storeTopics,
     isLoading,
@@ -28,7 +43,7 @@ export function useTopicsController() {
     update,
     changeStatus,
     remove,
-  } = useVocabularyTopicStore();
+  } = useGrammarTopicStore();
 
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
@@ -65,7 +80,10 @@ export function useTopicsController() {
     );
   });
 
-  const totalPages = Math.max(1, Math.ceil(filteredTopics.length / pageSize));
+  const totalPages = Math.max(
+    1,
+    Math.ceil(filteredTopics.length / pageSize),
+  );
   const currentPage = Math.min(page, totalPages);
   const displayedTopics = filteredTopics.slice(
     (currentPage - 1) * pageSize,
@@ -76,7 +94,7 @@ export function useTopicsController() {
     setTopicEditor({ mode: "create" });
   };
 
-  const openEditTopic = (topic: VocabularyTopic) => {
+  const openEditTopic = (topic: GrammarTopic) => {
     setTopicEditor({ mode: "edit", topic });
   };
 
@@ -84,24 +102,24 @@ export function useTopicsController() {
     setTopicEditor(null);
   };
 
-  const saveTopic = async (
-    payload: CreateVocabularyTopicPayload | UpdateVocabularyTopicPayload,
-  ) => {
+  const saveTopic = async (payload: {
+    name: string;
+    description?: string;
+  }) => {
     setIsSaving(true);
 
     try {
       const cleanPayload = {
         name: payload.name ?? "",
         description: payload.description,
-        thumbnail: payload.thumbnail,
       };
 
       if (topicEditor?.mode === "edit") {
         await update(topicEditor.topic._id, cleanPayload);
-        toast.success("Đã cập nhật topic.");
+        toast.success("Đã cập nhật chủ đề.");
       } else {
         await create(cleanPayload);
-        toast.success("Đã tạo topic mới.");
+        toast.success("Đã tạo chủ đề mới.");
       }
 
       closeTopicEditor();
@@ -113,12 +131,15 @@ export function useTopicsController() {
     }
   };
 
-  const deleteTopic = async (topic: VocabularyTopic) => {
+  const deleteTopic = async (topic: GrammarTopic) => {
     try {
       await remove(topic._id);
-      toast.success("Đã xóa topic.");
+      toast.success("Đã xóa chủ đề.");
 
-      if (topicEditor?.mode === "edit" && topicEditor.topic._id === topic._id) {
+      if (
+        topicEditor?.mode === "edit" &&
+        topicEditor.topic._id === topic._id
+      ) {
         closeTopicEditor();
       }
 
@@ -127,10 +148,13 @@ export function useTopicsController() {
       toast.error(getErrorMessage(deleteError));
     }
   };
-  const toggleTopicStatus = async (topic: VocabularyTopic) => {
+
+  const toggleTopicStatus = async (topic: GrammarTopic) => {
     try {
       await changeStatus(topic._id, !topic.isActive);
-      toast.success(topic.isActive ? "Đã tạm ẩn topic." : "Đã hiển thị topic.");
+      toast.success(
+        topic.isActive ? "Đã tạm ẩn chủ đề." : "Đã hiển thị chủ đề.",
+      );
       await loadTopics();
     } catch (toggleError) {
       toast.error(getErrorMessage(toggleError));

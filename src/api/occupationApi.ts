@@ -31,6 +31,12 @@ interface ApiEnvelope<T> {
 }
 
 const occupationApi = {
+  // GET /api/occupations
+  getAll: (): Promise<Occupation[]> =>
+    axiosClient
+      .get<ApiEnvelope<Occupation[]>>("/occupations")
+      .then((res) => res.data.data),
+
   // GET /api/occupations/category/:categoryId
   getByCategory: (categoryId: string): Promise<Occupation[]> =>
     axiosClient

@@ -25,52 +25,52 @@ interface VocabularyLessonState {
   error: string | null;
 
   fetchByTopic: (
-    topicId: string,
+    topicSlug: string,
   ) => Promise<void>;
 
   fetchById: (
-    lessonId: string,
+    lessonSlug: string,
   ) => Promise<void>;
 
   create: (
-    topicId: string,
+    topicSlug: string,
     payload: CreateVocabularyLessonPayload,
   ) => Promise<void>;
 
   update: (
-    id: string,
+    lessonSlug: string,
     payload: UpdateVocabularyLessonPayload,
   ) => Promise<void>;
 
   changeStatus: (
-    id: string,
+    lessonSlug: string,
   ) => Promise<void>;
 
   remove: (
-    id: string,
+    lessonSlug: string,
   ) => Promise<void>;
 
   changeOrder: (
-    topicId: string,
+    topicSlug: string,
     orders: LessonOrderItem[],
   ) => Promise<void>;
 
   fetchWords: (
-    lessonId: string,
+    lessonSlug: string,
   ) => Promise<void>;
 
   addWord: (
-    lessonId: string,
+    lessonSlug: string,
     payload: AddWordPayload,
   ) => Promise<void>;
 
   removeWord: (
-    lessonId: string,
+    lessonSlug: string,
     wordId: string,
   ) => Promise<void>;
 
   fetchStudyWords: (
-    lessonId: string,
+    lessonSlug: string,
   ) => Promise<void>;
 
   reset: () => void;
@@ -89,7 +89,7 @@ export const useVocabularyLessonStore =
     isLoading: false,
     error: null,
 
-    fetchByTopic: async (topicId) => {
+    fetchByTopic: async (topicSlug) => {
       set({
         isLoading: true,
         error: null,
@@ -98,7 +98,7 @@ export const useVocabularyLessonStore =
       try {
         const lessons =
           await vocabularyLessonApi.getByTopic(
-            topicId,
+            topicSlug,
           );
 
         set({
@@ -120,10 +120,10 @@ export const useVocabularyLessonStore =
       }
     },
 
-    fetchById: async (lessonId) => {
+    fetchById: async (lessonSlug) => {
       const lesson =
         await vocabularyLessonApi.getById(
-          lessonId,
+          lessonSlug,
         );
 
       set({
@@ -132,12 +132,12 @@ export const useVocabularyLessonStore =
     },
 
     create: async (
-      topicId,
+      topicSlug,
       payload,
     ) => {
       const lesson =
         await vocabularyLessonApi.create(
-          topicId,
+          topicSlug,
           payload,
         );
 
@@ -147,33 +147,33 @@ export const useVocabularyLessonStore =
     },
 
     update: async (
-      id,
+      lessonSlug,
       payload,
     ) => {
       const updated =
         await vocabularyLessonApi.update(
-          id,
+          lessonSlug,
           payload,
         );
 
       set({
         lessons: get().lessons.map((lesson) =>
-          lesson._id === id
+          lesson._id === updated._id
             ? updated
             : lesson,
         ),
       });
     },
 
-    changeStatus: async (id) => {
+    changeStatus: async (lessonSlug) => {
       const result =
         await vocabularyLessonApi.changeStatus(
-          id,
+          lessonSlug,
         );
 
       set({
         lessons: get().lessons.map((lesson) =>
-          lesson._id === id
+          lesson._id === result.lessonId
             ? {
                 ...lesson,
                 isActive: result.isActive,
@@ -183,32 +183,34 @@ export const useVocabularyLessonStore =
       });
     },
 
-    remove: async (id) => {
-      await vocabularyLessonApi.delete(id);
+    remove: async (lessonSlug) => {
+      const targetId = lessonSlug;
+
+      await vocabularyLessonApi.delete(lessonSlug);
 
       set({
         lessons: get().lessons.filter(
-          (lesson) => lesson._id !== id,
+          (lesson) => lesson._id !== targetId && lesson.slug !== targetId,
         ),
       });
     },
 
     changeOrder: async (
-      topicId,
+      topicSlug,
       orders,
     ) => {
       await vocabularyLessonApi.changeOrder(
-        topicId,
+        topicSlug,
         orders,
       );
 
-      await get().fetchByTopic(topicId);
+      await get().fetchByTopic(topicSlug);
     },
 
-    fetchWords: async (lessonId) => {
+    fetchWords: async (lessonSlug) => {
       const words =
         await vocabularyLessonApi.getWords(
-          lessonId,
+          lessonSlug,
         );
 
       set({
@@ -217,29 +219,29 @@ export const useVocabularyLessonStore =
     },
 
     addWord: async (
-      lessonId,
+      lessonSlug,
       payload,
     ) => {
       await vocabularyLessonApi.addWord(
-        lessonId,
+        lessonSlug,
         payload,
       );
     },
 
     removeWord: async (
-      lessonId,
+      lessonSlug,
       wordId,
     ) => {
       await vocabularyLessonApi.removeWord(
-        lessonId,
+        lessonSlug,
         wordId,
       );
     },
 
-    fetchStudyWords: async (lessonId) => {
+    fetchStudyWords: async (lessonSlug) => {
       const result =
         await vocabularyLessonApi.getStudyWords(
-          lessonId,
+          lessonSlug,
         );
 
       set({

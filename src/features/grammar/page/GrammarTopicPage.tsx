@@ -3,13 +3,13 @@ import { Plus, Search } from "lucide-react";
 
 import ConfirmDeleteDialog from "@/features/vocabulary/components/ConfirmDeleteDialog";
 import PaginationBar from "@/features/vocabulary/components/PaginationBar";
-import TopicCard from "@/features/vocabulary/components/TopicCard";
-import TopicFormDialog from "@/features/vocabulary/components/TopicFormDialog";
+import GrammarTopicCard from "@/features/grammar/components/GrammarTopicCard";
+import GrammarTopicFormDialog from "@/features/grammar/components/GrammarTopicFormDialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useTopicsController } from "@/features/vocabulary/hooks/useTopicsController";
-import type { VocabularyTopic } from "@/features/vocabulary/types";
+import { useGrammarTopicsController } from "@/features/grammar/hooks/useGrammarTopicsController";
+import type { GrammarTopic } from "@/api/grammarTopicApi";
 
 function TopicSkeletonGrid() {
   return (
@@ -21,11 +21,9 @@ function TopicSkeletonGrid() {
   );
 }
 
-export default function TopicPage() {
-  const controller = useTopicsController();
-  const [topicToDelete, setTopicToDelete] = useState<VocabularyTopic | null>(
-    null,
-  );
+export default function GrammarTopicPage() {
+  const controller = useGrammarTopicsController();
+  const [topicToDelete, setTopicToDelete] = useState<GrammarTopic | null>(null);
   const isEditorOpen = controller.topicEditor !== null;
 
   return (
@@ -33,10 +31,10 @@ export default function TopicPage() {
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h2 className="font-heading text-2xl font-semibold text-foreground">
-            Topics
+            Grammar Topics
           </h2>
           <p className="text-sm text-muted-foreground">
-            {controller.totalTopics} topic phù hợp
+            {controller.totalTopics} chủ đề phù hợp
           </p>
         </div>
 
@@ -51,7 +49,7 @@ export default function TopicPage() {
         <Input
           value={controller.search}
           onChange={(event) => controller.setSearch(event.target.value)}
-          placeholder="Tìm topic..."
+          placeholder="Tìm chủ đề..."
           className="pl-9"
         />
       </div>
@@ -72,11 +70,11 @@ export default function TopicPage() {
         <div className="rounded-3xl border border-dashed border-border px-4 py-12 text-center">
           <p className="font-medium text-foreground">
             {controller.search
-              ? "Không tìm thấy topic phù hợp."
-              : "Chưa có topic nào"}
+              ? "Không tìm thấy chủ đề phù hợp."
+              : "Chưa có chủ đề nào"}
           </p>
           <p className="mt-1 text-sm text-muted-foreground">
-            Hãy tạo topic đầu tiên để bắt đầu quản lý vocabulary.
+            Hãy tạo chủ đề đầu tiên để bắt đầu quản lý ngữ pháp.
           </p>
         </div>
       ) : null}
@@ -84,7 +82,7 @@ export default function TopicPage() {
       {controller.topics.length > 0 ? (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {controller.topics.map((topic) => (
-            <TopicCard
+            <GrammarTopicCard
               key={topic._id}
               topic={topic}
               onEdit={controller.openEditTopic}
@@ -104,7 +102,7 @@ export default function TopicPage() {
       />
 
       {isEditorOpen ? (
-        <TopicFormDialog
+        <GrammarTopicFormDialog
           key={
             controller.topicEditor?.mode === "edit"
               ? `edit-${controller.topicEditor.topic._id}`
@@ -129,12 +127,12 @@ export default function TopicPage() {
 
       <ConfirmDeleteDialog
         open={Boolean(topicToDelete)}
-        title="Xóa topic?"
+        title="Xóa chủ đề?"
         description={
           topicToDelete ? (
             <>
-              Topic <strong>{topicToDelete.name}</strong> sẽ bị xóa vĩnh viễn.
-              Các lesson bên trong vẫn cần được xử lý riêng nếu backend không tự
+              Chủ đề <strong>{topicToDelete.name}</strong> sẽ bị xóa vĩnh viễn.
+              Các bài học bên trong vẫn cần được xử lý riêng nếu backend không tự
               cascade.
             </>
           ) : null

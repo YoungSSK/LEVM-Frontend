@@ -32,7 +32,7 @@ export interface WordMeaning {
 
 export interface Word {
   _id: string;
-
+  slug: string;
   word: string;
 
   pronunciations: {
@@ -115,14 +115,15 @@ const wordApi = {
       )
       .then((res) => res.data.data),
 
-  getById: (id: string): Promise<Word> =>
+  // GET /words/:wordSlug
+  getById: (wordSlug: string): Promise<Word> =>
     axiosClient
-      .get<ApiEnvelope<Word>>(`/words/${id}`)
+      .get<ApiEnvelope<Word>>(`/words/${wordSlug}`)
       .then((res) => res.data.data),
 
-  getDetail: (id: string): Promise<any> =>
+  getDetail: (wordSlug: string): Promise<unknown> =>
     axiosClient
-      .get<ApiEnvelope<any>>(`/words/${id}/detail`)
+      .get<ApiEnvelope<unknown>>(`/words/${wordSlug}/detail`)
       .then((res) => res.data.data),
 
   create: (payload: CreateWordPayload): Promise<Word> =>

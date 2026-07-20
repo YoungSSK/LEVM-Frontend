@@ -4,6 +4,7 @@ export interface VocabularyTopic {
   _id: string;
 
   name: string;
+  slug: string;
   description: string;
   thumbnail: string;
 
@@ -70,11 +71,11 @@ const vocabularyTopicApi = {
       )
       .then((res) => res.data.data),
 
-  // GET /vocabulary-topics/:id
-  getById: (id: string): Promise<VocabularyTopic> =>
+  // GET /vocabulary-topics/:id  (id có thể là slug)
+  getById: (idOrSlug: string): Promise<VocabularyTopic> =>
     axiosClient
       .get<ApiEnvelope<VocabularyTopic>>(
-        `/vocabulary-topics/${id}`,
+        `/vocabulary-topics/${idOrSlug}`,
       )
       .then((res) => res.data.data),
 

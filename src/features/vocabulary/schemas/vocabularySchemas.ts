@@ -74,13 +74,13 @@ export interface LessonFormValues {
 
 export interface LessonFormResult {
   errors: FieldErrors<
-    "topicId" | "title" | "description" | "thumbnail" | "estimatedTime"
+    "topicSlug" | "title" | "description" | "thumbnail" | "estimatedTime"
   >;
   values?: CreateVocabularyLessonPayload;
 }
 
 export function validateLessonForm(
-  values: LessonFormValues & { topicId: string },
+  values: LessonFormValues & { topicSlug: string },
 ): LessonFormResult {
   const title = values.title.trim();
   const description = values.description.trim();
@@ -90,11 +90,11 @@ export function validateLessonForm(
       ? undefined
       : Number.parseInt(values.estimatedTime, 10);
   const errors: FieldErrors<
-    "topicId" | "title" | "description" | "thumbnail" | "estimatedTime"
+    "topicSlug" | "title" | "description" | "thumbnail" | "estimatedTime"
   > = {};
 
-  if (!values.topicId.trim()) {
-    errors.topicId = "Hãy chọn topic trước khi tạo lesson.";
+  if (!values.topicSlug.trim()) {
+    errors.topicSlug = "Hãy chọn topic trước khi tạo lesson.";
   }
 
   if (!title) {
@@ -122,12 +122,12 @@ export function validateLessonForm(
 }
 
 export interface LessonUpdateFormValues extends LessonFormValues {
-  topicId: string;
+  topicSlug: string;
 }
 
 export interface LessonUpdateFormResult {
   errors: FieldErrors<
-    "topicId" | "title" | "description" | "thumbnail" | "order"
+    "topicSlug" | "title" | "description" | "thumbnail" | "order"
   >;
   values?: UpdateVocabularyLessonPayload;
 }

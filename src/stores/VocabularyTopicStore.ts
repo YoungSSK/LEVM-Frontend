@@ -27,18 +27,18 @@ interface VocabularyTopicState {
   ) => Promise<void>;
 
   update: (
-    id: string,
+    topicSlug: string,
     payload: UpdateVocabularyTopicPayload,
   ) => Promise<void>;
 
   changeStatus: (
-    id: string,
+    topicSlug: string,
     currentStatus: boolean,
   ) => Promise<void>;
 
-  remove: (id: string) => Promise<void>;
+  remove: (topicSlug: string) => Promise<void>;
 
-  fetchStatistics: (id: string) => Promise<void>;
+  fetchStatistics: (topicSlug: string) => Promise<void>;
 
   reset: () => void;
 }
@@ -93,16 +93,16 @@ export const useVocabularyTopicStore =
       });
     },
 
-    update: async (id, payload) => {
+    update: async (topicSlug, payload) => {
       const updated =
         await vocabularyTopicApi.update(
-          id,
+          topicSlug,
           payload,
         );
 
       set({
         topics: get().topics.map((topic) =>
-          topic._id === id
+          topic._id === updated._id
             ? updated
             : topic,
         ),
@@ -110,37 +110,37 @@ export const useVocabularyTopicStore =
     },
 
     changeStatus: async (
-      id,
+      topicSlug,
       currentStatus,
     ) => {
       const updated =
         await vocabularyTopicApi.changeStatus(
-          id,
+          topicSlug,
           currentStatus,
         );
 
       set({
         topics: get().topics.map((topic) =>
-          topic._id === id
+          topic._id === updated._id
             ? updated
             : topic,
         ),
       });
     },
 
-    remove: async (id) => {
-      await vocabularyTopicApi.delete(id);
+    remove: async (topicSlug) => {
+      await vocabularyTopicApi.delete(topicSlug);
 
       set({
         topics: get().topics.filter(
-          (topic) => topic._id !== id,
+          (topic) => topic._id !== topicSlug,
         ),
       });
     },
 
-    fetchStatistics: async (id) => {
+    fetchStatistics: async (topicSlug) => {
       const statistics =
-        await vocabularyTopicApi.getStatistics(id);
+        await vocabularyTopicApi.getStatistics(topicSlug);
 
       set({
         statistics,

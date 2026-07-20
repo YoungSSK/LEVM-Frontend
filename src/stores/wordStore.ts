@@ -26,21 +26,21 @@ interface WordState {
 
   search: (keyword: string) => Promise<void>;
 
-  getById: (id: string) => Promise<void>;
+  getById: (wordSlug: string) => Promise<void>;
 
   create: (payload: CreateWordPayload) => Promise<void>;
 
   update: (
-    id: string,
+    wordSlug: string,
     payload: UpdateWordPayload,
   ) => Promise<void>;
 
   changeStatus: (
-    id: string,
+    wordSlug: string,
     isActive: boolean,
   ) => Promise<void>;
 
-  remove: (id: string) => Promise<void>;
+  remove: (wordSlug: string) => Promise<void>;
 
   reset: () => void;
 }
@@ -112,8 +112,8 @@ export const useWordStore = create<WordState>((set, get) => ({
     }
   },
 
-  getById: async (id) => {
-    const word = await wordApi.getById(id);
+  getById: async (wordSlug) => {
+    const word = await wordApi.getById(wordSlug);
 
     set({
       selectedWord: word,
@@ -128,56 +128,60 @@ export const useWordStore = create<WordState>((set, get) => ({
     });
   },
 
-  update: async (id, payload) => {
+  update: async (wordSlug, payload) => {
     const updatedWord = await wordApi.update(
-      id,
+      wordSlug,
       payload,
     );
 
     set({
       words: get().words.map((word) =>
-        word._id === id ? updatedWord : word,
+        word._id === updatedWord._id
+          ? updatedWord
+          : word,
       ),
 
       selectedWord:
-        get().selectedWord?._id === id
+        get().selectedWord?._id === updatedWord._id
           ? updatedWord
           : get().selectedWord,
     });
   },
 
   changeStatus: async (
-    id,
+    wordSlug,
     isActive,
   ) => {
     const updatedWord =
       await wordApi.changeStatus(
-        id,
+        wordSlug,
         isActive,
       );
 
     set({
       words: get().words.map((word) =>
-        word._id === id ? updatedWord : word,
+        word._id === updatedWord._id
+          ? updatedWord
+          : word,
       ),
 
       selectedWord:
-        get().selectedWord?._id === id
+        get().selectedWord?._id === updatedWord._id
           ? updatedWord
           : get().selectedWord,
     });
   },
 
-  remove: async (id) => {
-    await wordApi.remove(id);
+  remove: async (wordSlug) => {
+    await wordApi.remove(wordSlug);
 
     set({
       words: get().words.filter(
-        (word) => word._id !== id,
+        (word) => word._id !== wordSlug,
       ),
 
       selectedWord:
-        get().selectedWord?._id === id
+        get().selectedWord?._id === wordSlug
           ? null
           : get().selectedWord,
     });
