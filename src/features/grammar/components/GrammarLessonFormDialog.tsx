@@ -11,14 +11,9 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import type { GrammarLesson, LessonType } from "@/api/grammarLessonApi";
+import type {
+  GrammarLesson,
+} from "@/api/grammarLessonApi";
 import { validateGrammarLessonForm } from "@/features/grammar/schemas/grammarSchemas";
 
 interface GrammarLessonFormDialogProps {
@@ -27,18 +22,16 @@ interface GrammarLessonFormDialogProps {
   topicId: string;
   topicName: string;
   lesson: GrammarLesson | null;
-  theoryLessons: GrammarLesson[];
   isSubmitting: boolean;
   onOpenChange: (open: boolean) => void;
   onSubmit: (payload: {
     topicId: string;
     title: string;
     shortDescription?: string;
-    htmlContent?: string;
     thumbnailUrl?: string;
     estimatedTime?: number;
-    lessonType?: LessonType;
-    parentLessonId?: string | null;
+    xpReward?: number;
+    passThreshold?: number;
   }) => Promise<void>;
 }
 
@@ -48,7 +41,6 @@ export default function GrammarLessonFormDialog({
   topicId,
   topicName,
   lesson,
-  theoryLessons,
   isSubmitting,
   onOpenChange,
   onSubmit,
@@ -57,27 +49,25 @@ export default function GrammarLessonFormDialog({
   const [shortDescription, setShortDescription] = useState(
     lesson?.shortDescription ?? "",
   );
-  const [htmlContent, setHtmlContent] = useState(
-    lesson?.htmlContent ?? "",
-  );
   const [thumbnailUrl, setThumbnailUrl] = useState(
     lesson?.thumbnailUrl ?? "",
   );
   const [estimatedTime, setEstimatedTime] = useState(
     String(lesson?.estimatedTime ?? 0),
   );
-  const [lessonType, setLessonType] = useState<LessonType>(
-    lesson?.lessonType ?? "theory",
+  const [xpReward, setXpReward] = useState(
+    String(lesson?.xpReward ?? 10),
   );
-  const [parentLessonId, setParentLessonId] = useState(
-    lesson?.parentLessonId ?? "",
+  const [passThreshold, setPassThreshold] = useState(
+    String(lesson?.passThreshold ?? 70),
   );
   const [errors, setErrors] = useState<{
     title?: string;
     shortDescription?: string;
-    htmlContent?: string;
     thumbnailUrl?: string;
     estimatedTime?: string;
+    xpReward?: string;
+    passThreshold?: string;
   }>({});
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
@@ -87,11 +77,10 @@ export default function GrammarLessonFormDialog({
       topicId,
       title,
       shortDescription,
-      htmlContent,
       thumbnailUrl,
       estimatedTime,
-      lessonType,
-      parentLessonId,
+      xpReward,
+      passThreshold,
     });
 
     if (!result.values) {
@@ -112,7 +101,7 @@ export default function GrammarLessonFormDialog({
           </DialogTitle>
           <DialogDescription>
             {mode === "create"
-              ? "Tạo bài học ngữ pháp mới cho chủ đề đang chọn."
+              ? "Tạo bài học ngữ pháp mới cho chủ đề đang chọn. Nội dung lý thuyết có thể upload sau."
               : "Cập nhật thông tin bài học."}
           </DialogDescription>
         </DialogHeader>
@@ -131,61 +120,6 @@ export default function GrammarLessonFormDialog({
               </p>
             </div>
           </div>
-
-          <div className="space-y-2">
-            <label className="text-sm font-medium text-foreground">
-              Loại bài học
-            </label>
-            <Select
-              value={lessonType}
-              onValueChange={(value) => {
-                setLessonType(value as LessonType);
-                if (value === "theory") {
-                  setParentLessonId("");
-                }
-              }}
-            >
-              <SelectTrigger aria-invalid={false}>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="theory">Lý thuyết</SelectItem>
-                <SelectItem value="exercise">Bài tập</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          {lessonType === "exercise" && (
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-foreground">
-                Bài lý thuyết cha
-              </label>
-              <Select
-                value={parentLessonId}
-                onValueChange={(value) => setParentLessonId(value)}
-              >
-                <SelectTrigger aria-invalid={false}>
-                  <SelectValue placeholder="Chọn bài lý thuyết..." />
-                </SelectTrigger>
-                <SelectContent>
-                  {theoryLessons.length === 0 ? (
-                    <SelectItem value="__empty__" disabled>
-                      Chưa có bài lý thuyết nào
-                    </SelectItem>
-                  ) : (
-                    theoryLessons.map((t) => (
-                      <SelectItem key={t._id} value={t._id}>
-                        {t.title}
-                      </SelectItem>
-                    ))
-                  )}
-                </SelectContent>
-              </Select>
-              <p className="text-xs text-muted-foreground">
-                Bài tập sẽ được gắn vào bài lý thuyết đã chọn.
-              </p>
-            </div>
-          )}
 
           <div className="space-y-2">
             <label className="text-sm font-medium text-foreground">
@@ -215,24 +149,6 @@ export default function GrammarLessonFormDialog({
             {errors.shortDescription ? (
               <p className="text-xs text-destructive">
                 {errors.shortDescription}
-              </p>
-            ) : null}
-          </div>
-
-          <div className="space-y-2">
-            <label className="text-sm font-medium text-foreground">
-              Nội dung HTML
-            </label>
-            <Textarea
-              value={htmlContent}
-              onChange={(event) => setHtmlContent(event.target.value)}
-              placeholder="Nhập nội dung bài học dạng HTML..."
-              className="min-h-[120px] font-mono text-xs"
-              aria-invalid={Boolean(errors.htmlContent)}
-            />
-            {errors.htmlContent ? (
-              <p className="text-xs text-destructive">
-                {errors.htmlContent}
               </p>
             ) : null}
           </div>
@@ -279,6 +195,52 @@ export default function GrammarLessonFormDialog({
                 {errors.estimatedTime}
               </p>
             ) : null}
+          </div>
+
+          <div className="grid grid-cols-2 gap-3">
+            <div className="space-y-1">
+              <label className="text-xs font-medium text-muted-foreground">
+                XP thưởng
+              </label>
+              <Input
+                type="number"
+                min={0}
+                max={1000}
+                value={xpReward}
+                onChange={(e) => setXpReward(e.target.value)}
+                placeholder="10"
+                aria-invalid={Boolean(errors.xpReward)}
+                className="text-sm"
+              />
+              {errors.xpReward ? (
+                <p className="text-xs text-destructive">{errors.xpReward}</p>
+              ) : null}
+              <p className="text-[10px] text-muted-foreground">
+                Mặc định 10, tối đa 1000
+              </p>
+            </div>
+
+            <div className="space-y-1">
+              <label className="text-xs font-medium text-muted-foreground">
+                Ngưỡng đạt (%)
+              </label>
+              <Input
+                type="number"
+                min={0}
+                max={100}
+                value={passThreshold}
+                onChange={(e) => setPassThreshold(e.target.value)}
+                placeholder="70"
+                aria-invalid={Boolean(errors.passThreshold)}
+                className="text-sm"
+              />
+              {errors.passThreshold ? (
+                <p className="text-xs text-destructive">{errors.passThreshold}</p>
+              ) : null}
+              <p className="text-[10px] text-muted-foreground">
+                Mặc định 70%, tối đa 100%
+              </p>
+            </div>
           </div>
 
           <div className="flex gap-2 border-t border-border pt-4">

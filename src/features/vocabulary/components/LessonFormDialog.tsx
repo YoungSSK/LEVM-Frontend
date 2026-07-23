@@ -27,6 +27,7 @@ interface LessonFormDialogProps {
     description?: string;
     thumbnail?: string;
     estimatedTime?: number;
+    xpReward?: number;
   }) => Promise<void>;
 }
 
@@ -46,12 +47,16 @@ export default function LessonFormDialog({
   const [estimatedTime, setEstimatedTime] = useState(
     String(lesson?.estimatedTime ?? 0),
   );
+  const [xpReward, setXpReward] = useState(
+    String(lesson?.xpReward ?? 10),
+  );
   const [errors, setErrors] = useState<{
     topicSlug?: string;
     title?: string;
     description?: string;
     thumbnail?: string;
     estimatedTime?: string;
+    xpReward?: string;
   }>({});
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
@@ -63,6 +68,7 @@ export default function LessonFormDialog({
       description,
       thumbnail,
       estimatedTime,
+      xpReward,
     });
 
     if (!result.values) {
@@ -175,6 +181,27 @@ export default function LessonFormDialog({
                 {errors.estimatedTime}
               </p>
             ) : null}
+          </div>
+
+          <div className="space-y-2">
+            <label className="text-sm font-medium text-foreground">
+              XP thưởng (khi hoàn thành bài học)
+            </label>
+            <Input
+              type="number"
+              min={0}
+              max={1000}
+              value={xpReward}
+              onChange={(event) => setXpReward(event.target.value)}
+              placeholder="10"
+              aria-invalid={Boolean(errors.xpReward)}
+            />
+            {errors.xpReward ? (
+              <p className="text-xs text-destructive">{errors.xpReward}</p>
+            ) : null}
+            <p className="text-xs text-muted-foreground">
+              Mặc định 10 XP, tối đa 1000.
+            </p>
           </div>
           <div className="flex gap-2 border-t border-border pt-4">
             <Button

@@ -10,6 +10,7 @@ import OccupationPage from "@/features/occupation/OccupationPage";
 import GrammarPage from "@/features/grammar/page/GrammarPage";
 import GrammarTopicPage from "@/features/grammar/page/GrammarTopicPage";
 import GrammarTopicDetailPage from "@/features/grammar/page/GrammarTopicDetailPage";
+import GrammarLessonDetailPage from "@/features/grammar/page/GrammarLessonDetailPage";
 import LessonDetailPage from "@/features/vocabulary/page/LessonDetailPage";
 import TopicDetailPage from "@/features/vocabulary/page/TopicDetailPage";
 import TopicPage from "@/features/vocabulary/page/TopicPage";
@@ -86,6 +87,7 @@ function App() {
               <Route index element={<Navigate to="topics" replace />} />
               <Route path="topics" element={<GrammarTopicPage />} />
               <Route path="topics/:topicSlug" element={<GrammarTopicDetailPage />} />
+              <Route path="topics/:topicSlug/lessons/:lessonSlug" element={<GrammarLessonDetailPage />} />
             </Route>
           </Route>
           <Route

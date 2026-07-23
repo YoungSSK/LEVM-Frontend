@@ -4,6 +4,8 @@ export const grammarRoutePaths = {
   root: "/grammar",
   topics: "/grammar/topics",
   topicDetail: (topicSlug: string) => `/grammar/topics/${topicSlug}`,
+  lessonDetail: (topicSlug: string, lessonSlug: string) =>
+    `/grammar/topics/${topicSlug}/lessons/${lessonSlug}`,
 } as const;
 
 export const grammarNavigationItems = [

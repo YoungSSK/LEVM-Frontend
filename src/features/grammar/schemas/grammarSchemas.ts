@@ -1,5 +1,3 @@
-import type { LessonType } from "@/api/grammarLessonApi";
-
 type FieldErrors<T extends string> = Partial<Record<T, string>>;
 
 export interface GrammarTopicFormValues {
@@ -42,27 +40,25 @@ export function validateGrammarTopicForm(
 export interface GrammarLessonFormValues {
   title: string;
   shortDescription: string;
-  htmlContent: string;
   thumbnailUrl: string;
   estimatedTime: string;
-  lessonType: LessonType;
-  parentLessonId: string;
+  xpReward: string;
+  passThreshold: string;
 }
 
 export interface GrammarLessonFormResult {
-  errors: FieldErrors<"title" | "shortDescription" | "htmlContent" | "thumbnailUrl" | "estimatedTime">;
+  errors: FieldErrors<"title" | "shortDescription" | "thumbnailUrl" | "estimatedTime" | "xpReward" | "passThreshold">;
   values?: {
     topicId: string;
     title: string;
     shortDescription?: string;
-    htmlContent?: string;
     thumbnailUrl?: string;
     estimatedTime?: number;
     order?: number;
     isPublished?: boolean;
     isActive?: boolean;
-    lessonType?: LessonType;
-    parentLessonId?: string | null;
+    xpReward?: number;
+    passThreshold?: number;
   };
 }
 
@@ -71,18 +67,21 @@ export function validateGrammarLessonForm(
 ): GrammarLessonFormResult {
   const title = values.title.trim();
   const shortDescription = values.shortDescription.trim();
-  const htmlContent = values.htmlContent.trim();
   const thumbnailUrl = values.thumbnailUrl.trim();
   const estimatedTime =
     values.estimatedTime.trim() === ""
       ? undefined
       : Number.parseInt(values.estimatedTime, 10);
-  const lessonType = values.lessonType || "theory";
-  const parentLessonId =
-    values.parentLessonId.trim() === "" ? null : values.parentLessonId.trim() || null;
+
+  const xpRewardRaw = values.xpReward.trim();
+  const xpReward =
+    xpRewardRaw === "" ? 10 : Number.parseInt(xpRewardRaw, 10);
+  const passThresholdRaw = values.passThreshold.trim();
+  const passThreshold =
+    passThresholdRaw === "" ? 70 : Number.parseInt(passThresholdRaw, 10);
 
   const errors: FieldErrors<
-    "title" | "shortDescription" | "htmlContent" | "thumbnailUrl" | "estimatedTime"
+    "title" | "shortDescription" | "thumbnailUrl" | "estimatedTime" | "xpReward" | "passThreshold"
   > = {};
 
   if (!title) {
@@ -96,6 +95,22 @@ export function validateGrammarLessonForm(
     errors.estimatedTime = "Thời gian ước tính phải là số nguyên không âm.";
   }
 
+  if (
+    !Number.isInteger(xpReward) ||
+    xpReward < 0 ||
+    xpReward > 1000
+  ) {
+    errors.xpReward = "XP thưởng phải là số nguyên từ 0 đến 1000.";
+  }
+
+  if (
+    !Number.isInteger(passThreshold) ||
+    passThreshold < 0 ||
+    passThreshold > 100
+  ) {
+    errors.passThreshold = "Ngưỡng đạt phải là số nguyên từ 0 đến 100.";
+  }
+
   return Object.keys(errors).length > 0
     ? { errors }
     : {
@@ -104,11 +119,10 @@ export function validateGrammarLessonForm(
           topicId: values.topicId,
           title,
           shortDescription: shortDescription || undefined,
-          htmlContent: htmlContent || undefined,
           thumbnailUrl: thumbnailUrl || undefined,
           estimatedTime,
-          lessonType,
-          parentLessonId,
+          xpReward,
+          passThreshold,
         },
       };
 }

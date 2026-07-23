@@ -17,6 +17,9 @@ export interface VocabularyLesson {
 
   isActive: boolean;
 
+  /** XP cộng khi user hoàn thành lesson (Admin chỉnh được). */
+  xpReward: number;
+
   createdAt?: string;
   updatedAt?: string;
 }
@@ -77,6 +80,7 @@ export interface CreateVocabularyLessonPayload {
   description?: string;
   thumbnail?: string;
   estimatedTime?: number;
+  xpReward?: number;
 }
 
 export interface UpdateVocabularyLessonPayload {
@@ -84,6 +88,7 @@ export interface UpdateVocabularyLessonPayload {
   description?: string;
   thumbnail?: string;
   estimatedTime?: number;
+  xpReward?: number;
 }
 
 export interface AddWordPayload {

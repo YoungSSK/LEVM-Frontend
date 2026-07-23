@@ -15,8 +15,18 @@ export interface GrammarLesson {
   order: number;
   isPublished: boolean;
   isActive: boolean;
+  /** @deprecated sẽ xoá — dùng GrammarQuizQuestion */
   lessonType?: LessonType;
+  /** @deprecated sẽ xoá — dùng GrammarQuizQuestion */
   parentLessonId?: string | null;
+  /** Cộng XP khi user pass quiz lesson này (Admin chỉnh được). */
+  xpReward: number;
+  /** % đúng tối thiểu để tính "đạt" (mặc định 70). */
+  passThreshold: number;
+  /** Cờ cho biết lesson đã có câu hỏi quiz hay chưa. */
+  hasQuiz: boolean;
+  /** Audit timestamp cho autosave content. */
+  contentUpdatedAt?: string | null;
   createdAt?: string;
   updatedAt?: string;
 }
@@ -34,6 +44,9 @@ export interface GrammarLessonWithProgress {
   isActive: boolean;
   lessonType?: LessonType;
   parentLessonId?: string | null;
+  xpReward: number;
+  passThreshold: number;
+  hasQuiz: boolean;
   isCompleted?: boolean;
   completedAt?: string;
 }
@@ -57,6 +70,10 @@ export interface GrammarLessonDetail {
   isActive: boolean;
   lessonType?: LessonType;
   parentLessonId?: string | null;
+  xpReward: number;
+  passThreshold: number;
+  hasQuiz: boolean;
+  contentUpdatedAt?: string | null;
   previousLesson?: { _id: string; title: string; slug: string };
   nextLesson?: { _id: string; title: string; slug: string };
   createdAt?: string;
@@ -76,6 +93,8 @@ export interface CreateGrammarLessonPayload {
   isActive?: boolean;
   lessonType?: LessonType;
   parentLessonId?: string | null;
+  xpReward?: number;
+  passThreshold?: number;
 }
 
 export interface UpdateGrammarLessonPayload {
@@ -91,6 +110,15 @@ export interface UpdateGrammarLessonPayload {
   isActive?: boolean;
   lessonType?: LessonType;
   parentLessonId?: string | null;
+  xpReward?: number;
+  passThreshold?: number;
+}
+
+export interface UpdateGrammarLessonContentResponse {
+  _id: string;
+  contentUpdatedAt: string;
+  contentUpdatedBy: string | null;
+  plainTextContent: string;
 }
 
 export interface LessonOrderItem {
@@ -168,6 +196,65 @@ const grammarLessonApi = {
     axiosClient
       .patch(`/grammar-lessons/${lessonId}/order`, { order })
       .then(() => undefined),
+
+  // GET /grammar-lessons/:id — dùng để reload nội dung khi conflict (autosave).
+  getById: (lessonId: string): Promise<GrammarLessonDetail> =>
+    axiosClient
+      .get<ApiEnvelope<GrammarLessonDetail>>(`/grammar-lessons/${lessonId}`)
+      .then((res) => res.data.data),
+
+  /**
+   * PUT /grammar-lessons/:id/content — autosave editor lý thuyết.
+   * Tách riêng khỏi update() để không xung đột với metadata và cho phép debounce.
+   */
+  updateContent: (
+    lessonId: string,
+    htmlContent: string,
+    lastKnownContentUpdatedAt?: string | null,
+  ): Promise<UpdateGrammarLessonContentResponse> =>
+    axiosClient
+      .put<
+        ApiEnvelope<UpdateGrammarLessonContentResponse>
+      >(`/grammar-lessons/${lessonId}/content`, {
+        htmlContent,
+        lastKnownContentUpdatedAt: lastKnownContentUpdatedAt ?? undefined,
+      })
+      .then((res) => res.data.data),
+
+  /**
+   * POST /grammar-lessons/:id/from-document — upload DOCX để thay thế nội dung lesson đã tồn tại.
+   */
+  uploadFromDocument: (
+    lessonId: string,
+    file: File,
+    metadata?: {
+      title?: string;
+      shortDescription?: string;
+      thumbnailUrl?: string;
+      estimatedTime?: number;
+      isPublished?: boolean;
+      isActive?: boolean;
+      xpReward?: number;
+      passThreshold?: number;
+    },
+  ): Promise<GrammarLesson> => {
+    const form = new FormData();
+    form.append("file", file);
+    if (metadata) {
+      Object.entries(metadata).forEach(([key, value]) => {
+        if (value !== undefined) {
+          form.append(key, String(value));
+        }
+      });
+    }
+    return axiosClient
+      .post<ApiEnvelope<GrammarLesson>>(
+        `/grammar-lessons/${lessonId}/from-document`,
+        form,
+        { headers: { "Content-Type": "multipart/form-data" } },
+      )
+      .then((res) => res.data.data);
+  },
 };
 
 export default grammarLessonApi;

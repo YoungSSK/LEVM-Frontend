@@ -70,11 +70,12 @@ export interface LessonFormValues {
   description: string;
   thumbnail: string;
   estimatedTime: string;
+  xpReward: string;
 }
 
 export interface LessonFormResult {
   errors: FieldErrors<
-    "topicSlug" | "title" | "description" | "thumbnail" | "estimatedTime"
+    "topicSlug" | "title" | "description" | "thumbnail" | "estimatedTime" | "xpReward"
   >;
   values?: CreateVocabularyLessonPayload;
 }
@@ -89,8 +90,11 @@ export function validateLessonForm(
     values.estimatedTime.trim() === ""
       ? undefined
       : Number.parseInt(values.estimatedTime, 10);
+  const xpRewardRaw = values.xpReward.trim();
+  const xpReward =
+    xpRewardRaw === "" ? 10 : Number.parseInt(xpRewardRaw, 10);
   const errors: FieldErrors<
-    "topicSlug" | "title" | "description" | "thumbnail" | "estimatedTime"
+    "topicSlug" | "title" | "description" | "thumbnail" | "estimatedTime" | "xpReward"
   > = {};
 
   if (!values.topicSlug.trim()) {
@@ -108,6 +112,14 @@ export function validateLessonForm(
     errors.estimatedTime = "Estimated time phải là số nguyên không âm.";
   }
 
+  if (
+    !Number.isInteger(xpReward) ||
+    xpReward < 0 ||
+    xpReward > 1000
+  ) {
+    errors.xpReward = "XP thưởng phải là số nguyên từ 0 đến 1000.";
+  }
+
   return Object.keys(errors).length > 0
     ? { errors }
     : {
@@ -117,6 +129,7 @@ export function validateLessonForm(
           description: description || undefined,
           thumbnail: thumbnail || undefined,
           estimatedTime,
+          xpReward,
         },
       };
 }
@@ -127,7 +140,7 @@ export interface LessonUpdateFormValues extends LessonFormValues {
 
 export interface LessonUpdateFormResult {
   errors: FieldErrors<
-    "topicSlug" | "title" | "description" | "thumbnail" | "order"
+    "topicSlug" | "title" | "description" | "thumbnail" | "order" | "xpReward"
   >;
   values?: UpdateVocabularyLessonPayload;
 }
@@ -141,9 +154,18 @@ export function validateLessonUpdateForm(
     return { errors: result.errors };
   }
 
+  // Không gửi kèm topicSlug trong update payload.
+  const { xpReward, estimatedTime, description, thumbnail, title } =
+    result.values;
   return {
     errors: result.errors,
-    values: result.values,
+    values: {
+      title,
+      description,
+      thumbnail,
+      estimatedTime,
+      xpReward,
+    },
   };
 }
 
