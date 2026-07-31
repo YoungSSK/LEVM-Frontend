@@ -5,7 +5,7 @@ import { toast } from "sonner";
 import grammarTopicApi from "@/api/grammarTopicApi";
 import grammarLessonApi from "@/api/grammarLessonApi";
 import type { GrammarTopicDetail } from "@/api/grammarTopicApi";
-import type { LessonType, GrammarLesson } from "@/api/grammarLessonApi";
+import type { GrammarLesson } from "@/api/grammarLessonApi";
 
 function getErrorMessage(error: unknown) {
   return error instanceof Error
@@ -126,11 +126,10 @@ export function useGrammarTopicDetailController(topicSlug?: string) {
     topicId: string;
     title: string;
     shortDescription?: string;
-    htmlContent?: string;
     thumbnailUrl?: string;
     estimatedTime?: number;
-    lessonType?: LessonType;
-    parentLessonId?: string | null;
+    xpReward?: number;
+    passThreshold?: number;
   }) => {
     if (!topic) {
       toast.info("Topic chưa sẵn sàng.");
@@ -209,14 +208,9 @@ export function useGrammarTopicDetailController(topicSlug?: string) {
     }
   };
 
-  const theoryLessons = lessons.filter(
-    (l) => l.lessonType === "theory" || !l.lessonType,
-  );
-
   return {
     topic,
     lessons: sortByOrderThenLabel(lessons),
-    theoryLessons: sortByOrderThenLabel(theoryLessons),
     error,
     isLoadingTopic,
     isLoadingLessons,

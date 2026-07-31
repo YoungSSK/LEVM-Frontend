@@ -1,4 +1,4 @@
-import { Edit2, Trash2, Eye, EyeOff, Globe, GlobeLock, Clock } from "lucide-react";
+import { Edit2, Trash2, Eye, EyeOff, Globe, GlobeLock, Clock, Eye as ViewIcon } from "lucide-react";
 
 import type { GrammarLesson } from "@/api/grammarLessonApi";
 import { Button } from "@/components/ui/button";
@@ -13,6 +13,7 @@ import StatusBadge from "@/features/vocabulary/components/StatusBadge";
 
 interface GrammarLessonCardProps {
   lesson: GrammarLesson;
+  onView: (lesson: GrammarLesson) => void;
   onEdit: (lesson: GrammarLesson) => void;
   onDelete: (lesson: GrammarLesson) => void;
   onToggleStatus: (lesson: GrammarLesson) => void;
@@ -45,6 +46,7 @@ function LessonThumbnail({
 
 export default function GrammarLessonCard({
   lesson,
+  onView,
   onEdit,
   onDelete,
   onToggleStatus,
@@ -65,9 +67,20 @@ export default function GrammarLessonCard({
             </p>
           </div>
           <div className="flex flex-col items-end gap-1">
+            {lesson.hasQuiz ? (
+              <StatusBadge
+                label="Có trắc nghiệm"
+                tone="info"
+              />
+            ) : (
+              <StatusBadge
+                label="Chưa có trắc nghiệm"
+                tone="neutral"
+              />
+            )}
             <StatusBadge
-              label={lesson.lessonType === "exercise" ? "Bài tập" : "Lý thuyết"}
-              tone={lesson.lessonType === "exercise" ? "info" : "neutral"}
+              label={`${lesson.xpReward ?? 10} XP`}
+              tone="warning"
             />
             <StatusBadge
               label={lesson.isActive ? "Hiển thị" : "Đã ẩn"}
@@ -100,6 +113,15 @@ export default function GrammarLessonCard({
       </CardContent>
 
       <CardFooter className="mt-auto flex flex-wrap gap-2 border-t border-border/60 px-5 py-4">
+        <Button
+          type="button"
+          variant="default"
+          size="sm"
+          onClick={() => onView(lesson)}
+        >
+          <ViewIcon className="size-4" />
+          Xem chi tiết
+        </Button>
         <Button
           type="button"
           variant="outline"

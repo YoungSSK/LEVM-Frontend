@@ -77,7 +77,7 @@ export default function LessonCard({
           {lesson.description || "Chưa có mô tả."}
         </p>
 
-        <div className="mt-auto grid grid-cols-2 gap-3 rounded-2xl bg-muted/50 p-3 text-sm">
+        <div className="mt-auto grid grid-cols-3 gap-3 rounded-2xl bg-muted/50 p-3 text-sm">
           <div>
             <p className="text-[11px] uppercase tracking-[0.22em] text-muted-foreground">
               Word Count
@@ -93,6 +93,15 @@ export default function LessonCard({
             </p>
             <p className="mt-1 font-semibold text-foreground">
               {lesson.estimatedTime} phút
+            </p>
+          </div>
+          <div>
+            <p className="flex items-center gap-1 text-[11px] uppercase tracking-[0.22em] text-muted-foreground">
+              <span aria-hidden>🏆</span>
+              XP Reward
+            </p>
+            <p className="mt-1 font-semibold text-foreground">
+              {lesson.xpReward ?? 10}
             </p>
           </div>
         </div>

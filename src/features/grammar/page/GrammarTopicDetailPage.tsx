@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { ArrowLeft, Plus } from "lucide-react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 
 import ConfirmDeleteDialog from "@/features/vocabulary/components/ConfirmDeleteDialog";
 import GrammarLessonCard from "@/features/grammar/components/GrammarLessonCard";
@@ -24,6 +24,7 @@ function LessonSkeletonGrid() {
 
 export default function GrammarTopicDetailPage() {
   const { topicSlug } = useParams<{ topicSlug: string }>();
+  const navigate = useNavigate();
   const controller = useGrammarTopicDetailController(topicSlug);
   const [lessonToDelete, setLessonToDelete] = useState<GrammarLesson | null>(null);
   const isEditorOpen = controller.lessonEditor !== null;
@@ -89,7 +90,7 @@ export default function GrammarTopicDetailPage() {
 
       <div className="flex flex-wrap items-center justify-between gap-3">
         <h2 className="font-heading text-lg font-semibold text-foreground">
-          Lý thuyết
+          Bài học
         </h2>
 
         <Button
@@ -108,13 +109,11 @@ export default function GrammarTopicDetailPage() {
 
       {!controller.isLoadingLessons &&
       !controller.error &&
-      controller.lessons.filter(
-        (l) => l.lessonType === "theory" || !l.lessonType,
-      ).length === 0 ? (
+      controller.lessons.length === 0 ? (
         <div className="rounded-3xl border border-dashed border-border px-4 py-12 text-center">
-          <p className="font-medium text-foreground">Chưa có bài lý thuyết nào</p>
+          <p className="font-medium text-foreground">Chưa có bài học nào</p>
           <p className="mt-1 text-sm text-muted-foreground">
-            Hãy tạo bài lý thuyết đầu tiên cho chủ đề này.
+            Hãy tạo bài học đầu tiên cho chủ đề này.
           </p>
           <Button
             type="button"
@@ -128,50 +127,25 @@ export default function GrammarTopicDetailPage() {
         </div>
       ) : null}
 
-      {controller.lessons.filter(
-        (l) => l.lessonType === "theory" || !l.lessonType,
-      ).length > 0 ? (
+      {controller.lessons.length > 0 ? (
         <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-          {controller.lessons
-            .filter((l) => l.lessonType === "theory" || !l.lessonType)
-            .map((lesson) => (
-              <GrammarLessonCard
-                key={lesson._id}
-                lesson={lesson}
-                onEdit={controller.openEditLesson}
-                onDelete={setLessonToDelete}
-                onToggleStatus={controller.toggleLessonStatus}
-                onTogglePublish={controller.togglePublishStatus}
-              />
-            ))}
+          {controller.lessons.map((lesson) => (
+            <GrammarLessonCard
+              key={lesson._id}
+              lesson={lesson}
+              onView={() =>
+                navigate(
+                  grammarRoutePaths.lessonDetail(topicSlug!, lesson.slug),
+                )
+              }
+              onEdit={controller.openEditLesson}
+              onDelete={setLessonToDelete}
+              onToggleStatus={controller.toggleLessonStatus}
+              onTogglePublish={controller.togglePublishStatus}
+            />
+          ))}
         </div>
       ) : null}
-
-      {controller.lessons.filter((l) => l.lessonType === "exercise").length >
-        0 && (
-        <>
-          <div className="flex flex-wrap items-center justify-between gap-3 pt-2">
-            <h2 className="font-heading text-lg font-semibold text-foreground">
-              Bài tập
-            </h2>
-          </div>
-
-          <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-            {controller.lessons
-              .filter((l) => l.lessonType === "exercise")
-              .map((lesson) => (
-                <GrammarLessonCard
-                  key={lesson._id}
-                  lesson={lesson}
-                  onEdit={controller.openEditLesson}
-                  onDelete={setLessonToDelete}
-                  onToggleStatus={controller.toggleLessonStatus}
-                  onTogglePublish={controller.togglePublishStatus}
-                />
-              ))}
-          </div>
-        </>
-      )}
 
       {isEditorOpen && controller.topic ? (
         <GrammarLessonFormDialog
@@ -189,7 +163,6 @@ export default function GrammarTopicDetailPage() {
               ? controller.lessonEditor.lesson
               : null
           }
-          theoryLessons={controller.theoryLessons}
           isSubmitting={false}
           onOpenChange={(open) => {
             if (!open) {

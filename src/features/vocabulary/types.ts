@@ -62,6 +62,7 @@ export interface CreateVocabularyLessonPayload {
   order?: number;
   topicId?: string;
   isActive?: boolean;
+  xpReward?: number;
 }
 
 export interface UpdateVocabularyLessonPayload {
@@ -70,6 +71,7 @@ export interface UpdateVocabularyLessonPayload {
   thumbnail?: string;
   estimatedTime?: number;
   order?: number;
+  xpReward?: number;
 }
 
 export interface CreateVocabularyWordPayload {

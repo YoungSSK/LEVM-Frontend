@@ -54,8 +54,26 @@ axiosClient.interceptors.response.use(
     }
 
     // Thống nhất message lỗi để mọi nơi catch chỉ cần đọc error.message
-    const message =
-      error.response?.data?.message || error.message || "Lỗi hệ thống";
+    let message = error.message || "Lỗi hệ thống";
+
+    // Blob responses (file downloads) don't have a readable JSON body via
+    // error.response.data.message — try to parse JSON from blob on 4xx/5xx.
+    if (
+      error.response?.data instanceof Blob &&
+      error.response?.status >= 400
+    ) {
+      try {
+        const text = await error.response.data.text();
+        const json = JSON.parse(text);
+        message = json.message || message;
+      } catch {
+        message = `Lỗi ${error.response.status}: ${error.response.statusText}`;
+      }
+    } else {
+      message =
+        error.response?.data?.message || error.message || "Lỗi hệ thống";
+    }
+
     return Promise.reject(new Error(message));
   },
 );

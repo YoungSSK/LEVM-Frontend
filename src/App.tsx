@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import type { ReactNode } from "react";
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import { Toaster } from "sonner";
+import { TooltipProvider } from "@/components/ui/tooltip";
 
 import AdminLayout from "@/components/layout/AdminLayout";
 import AuthPage from "@/features/auth/AuthPage";
@@ -10,12 +11,17 @@ import OccupationPage from "@/features/occupation/OccupationPage";
 import GrammarPage from "@/features/grammar/page/GrammarPage";
 import GrammarTopicPage from "@/features/grammar/page/GrammarTopicPage";
 import GrammarTopicDetailPage from "@/features/grammar/page/GrammarTopicDetailPage";
+import GrammarLessonDetailPage from "@/features/grammar/page/GrammarLessonDetailPage";
 import LessonDetailPage from "@/features/vocabulary/page/LessonDetailPage";
 import TopicDetailPage from "@/features/vocabulary/page/TopicDetailPage";
 import TopicPage from "@/features/vocabulary/page/TopicPage";
 import VocabularyPage from "@/features/vocabulary/page/VocabularyPage";
 import WordDetailPage from "@/features/vocabulary/page/WordDetailPage";
 import WordPage from "@/features/vocabulary/page/WordPage";
+import ReadingPage from "@/features/reading/page/ReadingPage";
+import ReadingCategoryPage from "@/features/reading/page/ReadingCategoryPage";
+import ReadingCategoryDetailPage from "@/features/reading/page/ReadingCategoryDetailPage";
+import ReadingPassageDetailPage from "@/features/reading/page/ReadingPassageDetailPage";
 import { authStore, useAuthStore } from "@/stores/authStore";
 
 function ProtectedRoute({ children }: { children: ReactNode }) {
@@ -60,7 +66,7 @@ function App() {
   }, []);
 
   return (
-    <div>
+    <TooltipProvider>
       <Toaster position="bottom-right" richColors />
       <BrowserRouter>
         <Routes>
@@ -86,6 +92,13 @@ function App() {
               <Route index element={<Navigate to="topics" replace />} />
               <Route path="topics" element={<GrammarTopicPage />} />
               <Route path="topics/:topicSlug" element={<GrammarTopicDetailPage />} />
+              <Route path="topics/:topicSlug/lessons/:lessonSlug" element={<GrammarLessonDetailPage />} />
+            </Route>
+            <Route path="reading" element={<ReadingPage />}>
+              <Route index element={<Navigate to="categories" replace />} />
+              <Route path="categories" element={<ReadingCategoryPage />} />
+              <Route path="categories/:categorySlug" element={<ReadingCategoryDetailPage />} />
+              <Route path="passages/:passageSlug" element={<ReadingPassageDetailPage />} />
             </Route>
           </Route>
           <Route
@@ -99,7 +112,7 @@ function App() {
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </BrowserRouter>
-    </div>
+    </TooltipProvider>
   );
 }
 

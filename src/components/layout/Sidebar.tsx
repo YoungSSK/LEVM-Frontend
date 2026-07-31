@@ -1,4 +1,4 @@
-import { BookOpen, BookOpenText, Briefcase, LayoutDashboard, LayoutGrid } from "lucide-react";
+import { BookOpen, BookOpenText, Briefcase, FileText, LayoutDashboard, LayoutGrid } from "lucide-react";
 
 import logo from "@/assets/logo.png";
 import SidebarItem from "@/components/layout/SidebarItem";
@@ -34,6 +34,12 @@ const TABS: {
     label: "Grammar",
     icon: BookOpenText,
     to: "/grammar",
+  },
+  {
+    key: "reading",
+    label: "Reading",
+    icon: FileText,
+    to: "/reading",
   },
 ];
 
