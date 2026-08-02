@@ -11,6 +11,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
+import PackageAccessSelector from "@/components/PackageAccessSelector";
 import type { VocabularyLesson } from "@/features/vocabulary/types";
 import { validateLessonForm } from "@/features/vocabulary/schemas/vocabularySchemas";
 
@@ -28,6 +29,7 @@ interface LessonFormDialogProps {
     thumbnail?: string;
     estimatedTime?: number;
     xpReward?: number;
+    allowedPackageIds?: string[];
   }) => Promise<void>;
 }
 
@@ -49,6 +51,9 @@ export default function LessonFormDialog({
   );
   const [xpReward, setXpReward] = useState(
     String(lesson?.xpReward ?? 10),
+  );
+  const [allowedPackageIds, setAllowedPackageIds] = useState<string[]>(
+    (lesson?.allowedPackageIds as any[])?.map((p) => (typeof p === "object" ? p._id : p)) ?? [],
   );
   const [errors, setErrors] = useState<{
     topicSlug?: string;
@@ -77,7 +82,7 @@ export default function LessonFormDialog({
     }
 
     setErrors({});
-    await onSubmit(result.values);
+    await onSubmit({ ...result.values, allowedPackageIds });
   };
 
   return (
@@ -203,6 +208,13 @@ export default function LessonFormDialog({
               Mặc định 10 XP, tối đa 1000.
             </p>
           </div>
+
+          <PackageAccessSelector
+            value={allowedPackageIds}
+            onChange={setAllowedPackageIds}
+            disabled={isSubmitting}
+          />
+
           <div className="flex gap-2 border-t border-border pt-4">
             <Button
               type="button"

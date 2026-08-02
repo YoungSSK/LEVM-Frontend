@@ -22,6 +22,9 @@ import ReadingPage from "@/features/reading/page/ReadingPage";
 import ReadingCategoryPage from "@/features/reading/page/ReadingCategoryPage";
 import ReadingCategoryDetailPage from "@/features/reading/page/ReadingCategoryDetailPage";
 import ReadingPassageDetailPage from "@/features/reading/page/ReadingPassageDetailPage";
+import PackagePage from "@/features/packages/page/PackagePage";
+import PackagesListPage from "@/features/packages/page/PackagesListPage";
+import SubscriptionsListPage from "@/features/packages/page/SubscriptionsListPage";
 import { authStore, useAuthStore } from "@/stores/authStore";
 
 function ProtectedRoute({ children }: { children: ReactNode }) {
@@ -99,6 +102,12 @@ function App() {
               <Route path="categories" element={<ReadingCategoryPage />} />
               <Route path="categories/:categorySlug" element={<ReadingCategoryDetailPage />} />
               <Route path="passages/:passageSlug" element={<ReadingPassageDetailPage />} />
+            </Route>
+            {/* Membership */}
+            <Route path="packages" element={<PackagePage />}>
+              <Route index element={<Navigate to="list" replace />} />
+              <Route path="list" element={<PackagesListPage />} />
+              <Route path="subscriptions" element={<SubscriptionsListPage />} />
             </Route>
           </Route>
           <Route

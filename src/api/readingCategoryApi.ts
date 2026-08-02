@@ -75,6 +75,7 @@ export interface ReadingPassage {
   xpReward: number;
   passThreshold: number;
   hasQuestions: boolean;
+  allowedPackageIds?: string[];
   createdAt?: string;
   updatedAt?: string;
 }
