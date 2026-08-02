@@ -20,6 +20,9 @@ export interface VocabularyLesson {
   /** XP cộng khi user hoàn thành lesson (Admin chỉnh được). */
   xpReward: number;
 
+  /** Danh sách ID gói thành viên được phép truy cập (rỗng = Free) */
+  allowedPackageIds?: string[];
+
   createdAt?: string;
   updatedAt?: string;
 }

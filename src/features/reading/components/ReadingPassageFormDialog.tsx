@@ -20,6 +20,7 @@ import {
 } from "@/components/ui/dialog";
 import type { ReadingCategory } from "@/api/readingCategoryApi";
 import type { ReadingPassage } from "@/api/readingPassageApi";
+import PackageAccessSelector from "@/components/PackageAccessSelector";
 import {
   validateReadingPassageForm,
   type PassageDifficulty,
@@ -48,6 +49,7 @@ interface ReadingPassageFormDialogProps {
     xpReward: number;
     passThreshold: number;
     htmlContent?: string;
+    allowedPackageIds?: string[];
   }) => Promise<void>;
 }
 
@@ -89,6 +91,9 @@ export default function ReadingPassageFormDialog({
   const [passThreshold, setPassThreshold] = useState(
     String(passage?.passThreshold ?? 70),
   );
+  const [allowedPackageIds, setAllowedPackageIds] = useState<string[]>(
+    (passage?.allowedPackageIds as any[])?.map((p) => (typeof p === "object" ? p._id : p)) ?? [],
+  );
   const [htmlContent] = useState("<p>Nhập nội dung bài đọc ở đây...</p>");
 
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -118,6 +123,7 @@ export default function ReadingPassageFormDialog({
     await onSubmit({
       ...result.values,
       htmlContent: mode === "create" ? htmlContent : undefined,
+      allowedPackageIds,
     });
   };
 
@@ -330,6 +336,13 @@ export default function ReadingPassageFormDialog({
               <p className="text-xs text-destructive">{errors.thumbnail}</p>
             ) : null}
           </div>
+
+          {/* Package Access Selector */}
+          <PackageAccessSelector
+            value={allowedPackageIds}
+            onChange={setAllowedPackageIds}
+            disabled={isSubmitting}
+          />
 
           {/* Actions */}
           <div className="flex gap-2 border-t border-border pt-4">

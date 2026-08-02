@@ -11,6 +11,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
+import PackageAccessSelector from "@/components/PackageAccessSelector";
 import type {
   GrammarLesson,
 } from "@/api/grammarLessonApi";
@@ -32,6 +33,7 @@ interface GrammarLessonFormDialogProps {
     estimatedTime?: number;
     xpReward?: number;
     passThreshold?: number;
+    allowedPackageIds?: string[];
   }) => Promise<void>;
 }
 
@@ -61,6 +63,9 @@ export default function GrammarLessonFormDialog({
   const [passThreshold, setPassThreshold] = useState(
     String(lesson?.passThreshold ?? 70),
   );
+  const [allowedPackageIds, setAllowedPackageIds] = useState<string[]>(
+    (lesson?.allowedPackageIds as any[])?.map((p) => (typeof p === "object" ? p._id : p)) ?? [],
+  );
   const [errors, setErrors] = useState<{
     title?: string;
     shortDescription?: string;
@@ -89,7 +94,7 @@ export default function GrammarLessonFormDialog({
     }
 
     setErrors({});
-    await onSubmit(result.values);
+    await onSubmit({ ...result.values, allowedPackageIds });
   };
 
   return (
@@ -242,6 +247,12 @@ export default function GrammarLessonFormDialog({
               </p>
             </div>
           </div>
+
+          <PackageAccessSelector
+            value={allowedPackageIds}
+            onChange={setAllowedPackageIds}
+            disabled={isSubmitting}
+          />
 
           <div className="flex gap-2 border-t border-border pt-4">
             <Button
