@@ -1,4 +1,4 @@
-import { BookOpen, BookOpenText, Briefcase, Crown, FileText, LayoutDashboard, LayoutGrid } from "lucide-react";
+import { BookOpen, BookOpenText, Briefcase, Crown, FileText, Headphones, LayoutDashboard, LayoutGrid } from "lucide-react";
 
 import logo from "@/assets/logo.png";
 import SidebarItem from "@/components/layout/SidebarItem";
@@ -40,6 +40,12 @@ const TABS: {
     label: "Reading",
     icon: FileText,
     to: "/reading",
+  },
+  {
+    key: "listening",
+    label: "Listening",
+    icon: Headphones,
+    to: "/listening",
   },
   {
     key: "packages",

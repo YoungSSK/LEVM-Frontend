@@ -29,8 +29,18 @@ export default function GrammarTopicCard({
   return (
     <Card className="card-hover h-full border-border shadow-sm transition-all">
       <CardHeader className="space-y-3 px-5 pt-5">
-        <div className="flex aspect-[16/9] items-center justify-center rounded-2xl bg-gradient-to-br from-indigo-100 to-purple-50 text-xs font-semibold uppercase tracking-[0.28em] text-indigo-400">
-          GRAMMAR
+        <div className="overflow-hidden rounded-2xl">
+          {topic.thumbnail ? (
+            <img
+              src={topic.thumbnail}
+              alt={topic.name}
+              className="aspect-[16/9] w-full object-cover"
+            />
+          ) : (
+            <div className="flex aspect-[16/9] items-center justify-center bg-gradient-to-br from-indigo-100 to-purple-50 text-xs font-semibold uppercase tracking-[0.28em] text-indigo-400">
+              GRAMMAR
+            </div>
+          )}
         </div>
 
         <div className="flex items-start justify-between gap-3">

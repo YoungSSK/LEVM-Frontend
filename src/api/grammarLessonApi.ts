@@ -27,6 +27,8 @@ export interface GrammarLesson {
   hasQuiz: boolean;
   /** Audit timestamp cho autosave content. */
   contentUpdatedAt?: string | null;
+  /** Danh sách ID gói thành viên được phép truy cập (rỗng = Free) */
+  allowedPackageIds?: string[];
   createdAt?: string;
   updatedAt?: string;
 }
@@ -49,6 +51,7 @@ export interface GrammarLessonWithProgress {
   hasQuiz: boolean;
   isCompleted?: boolean;
   completedAt?: string;
+  allowedPackageIds?: string[];
 }
 
 export interface GrammarLessonDetail {
@@ -76,6 +79,7 @@ export interface GrammarLessonDetail {
   contentUpdatedAt?: string | null;
   previousLesson?: { _id: string; title: string; slug: string };
   nextLesson?: { _id: string; title: string; slug: string };
+  allowedPackageIds?: string[];
   createdAt?: string;
   updatedAt?: string;
 }
@@ -95,6 +99,7 @@ export interface CreateGrammarLessonPayload {
   parentLessonId?: string | null;
   xpReward?: number;
   passThreshold?: number;
+  allowedPackageIds?: string[];
 }
 
 export interface UpdateGrammarLessonPayload {
@@ -112,6 +117,7 @@ export interface UpdateGrammarLessonPayload {
   parentLessonId?: string | null;
   xpReward?: number;
   passThreshold?: number;
+  allowedPackageIds?: string[];
 }
 
 export interface UpdateGrammarLessonContentResponse {

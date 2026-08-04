@@ -84,6 +84,7 @@ export interface CreateVocabularyLessonPayload {
   thumbnail?: string;
   estimatedTime?: number;
   xpReward?: number;
+  allowedPackageIds?: string[];
 }
 
 export interface UpdateVocabularyLessonPayload {
@@ -92,6 +93,7 @@ export interface UpdateVocabularyLessonPayload {
   thumbnail?: string;
   estimatedTime?: number;
   xpReward?: number;
+  allowedPackageIds?: string[];
 }
 
 export interface AddWordPayload {

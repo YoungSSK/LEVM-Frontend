@@ -3,13 +3,15 @@ type FieldErrors<T extends string> = Partial<Record<T, string>>;
 export interface GrammarTopicFormValues {
   name: string;
   description: string;
+  thumbnail: string;
 }
 
 export interface GrammarTopicFormResult {
-  errors: FieldErrors<"name" | "description">;
+  errors: FieldErrors<"name" | "description" | "thumbnail">;
   values?: {
     name: string;
     description?: string;
+    thumbnail?: string;
     order?: number;
     isActive?: boolean;
   };
@@ -20,7 +22,8 @@ export function validateGrammarTopicForm(
 ): GrammarTopicFormResult {
   const name = values.name.trim();
   const description = values.description.trim();
-  const errors: FieldErrors<"name" | "description"> = {};
+  const thumbnail = values.thumbnail.trim();
+  const errors: FieldErrors<"name" | "description" | "thumbnail"> = {};
 
   if (!name) {
     errors.name = "Tên chủ đề không được để trống.";
@@ -33,6 +36,7 @@ export function validateGrammarTopicForm(
         values: {
           name,
           description: description || undefined,
+          thumbnail: thumbnail || undefined,
         },
       };
 }

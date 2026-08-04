@@ -11,6 +11,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
+import ImageUploadInput from "@/components/ImageUploadInput";
 import type { VocabularyTopic, CreateVocabularyTopicPayload } from "@/features/vocabulary/types";
 import { validateTopicForm } from "@/features/vocabulary/schemas/vocabularySchemas";
 
@@ -101,28 +102,14 @@ export default function TopicFormDialog({
             ) : null}
           </div>
 
-          <div className="space-y-2">
-            <label className="text-sm font-medium text-foreground">
-              Thumbnail URL
-            </label>
-            <Input
-              value={thumbnail}
-              onChange={(event) => setThumbnail(event.target.value)}
-              placeholder="https://..."
-              aria-invalid={Boolean(errors.thumbnail)}
-            />
-            {errors.thumbnail ? (
-              <p className="text-xs text-destructive">{errors.thumbnail}</p>
-            ) : null}
-
-            {thumbnail.trim() ? (
-              <img
-                src={thumbnail}
-                alt={name || "Topic thumbnail"}
-                className="mt-2 aspect-[16/9] w-full rounded-2xl object-cover"
-              />
-            ) : null}
-          </div>
+          <ImageUploadInput
+            value={thumbnail}
+            onChange={setThumbnail}
+            label="Ảnh Thumbnail Topic"
+            placeholder="Dán URL ảnh hoặc chọn file từ máy..."
+            error={errors.thumbnail}
+            disabled={isSubmitting}
+          />
 
           <div className="flex gap-2 border-t border-border pt-4">
             <Button

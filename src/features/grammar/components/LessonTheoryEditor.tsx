@@ -4,7 +4,8 @@ import { useEditor, EditorContent, type Editor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import Placeholder from "@tiptap/extension-placeholder";
 
-import { CheckCircle2, Loader2, AlertTriangle } from "lucide-react";
+import { CheckCircle2, Loader2, AlertTriangle, Save } from "lucide-react";
+import { toast } from "sonner";
 
 import grammarLessonApi from "@/api/grammarLessonApi";
 import { Button } from "@/components/ui/button";
@@ -15,13 +16,9 @@ import { Button } from "@/components/ui/button";
  * Tính năng:
  *  - TipTap (StarterKit + Placeholder).
  *  - Load htmlContent ban đầu + render.
- *  - Autosave: debounce 1.5s sau khi ngừng gõ -> PUT /grammar-lessons/:id/content.
+ *  - Nút "Xác nhận lưu" trực tiếp + Autosave: debounce 1.5s sau khi ngừng gõ -> PUT /grammar-lessons/:id/content.
  *  - Trạng thái: idle | saving | saved | conflict | error.
- *  - Optimistic locking: gửi lastKnownContentUpdatedAt; nếu server 409 -> cảnh báo,
- *    hỏi user "nội dung đã được cập nhật bởi người khác, tải lại?"
- *  - Hiển thị "Đã lưu lúc HH:mm" kiểu Google Docs.
- *  - Cảnh báo nhẹ "Đang được chỉnh sửa bởi người khác" nếu contentUpdatedAt
- *    trong vòng 2 phút trở lại.
+ *  - Optimistic locking: gửi lastKnownContentUpdatedAt; nếu server 409 -> cảnh báo.
  */
 export default function LessonTheoryEditor({
   lessonId,
@@ -52,7 +49,7 @@ export default function LessonTheoryEditor({
       StarterKit,
       Placeholder.configure({
         placeholder:
-          "Bắt đầu viết nội dung bài học tại đây. Hệ thống sẽ tự động lưu...",
+          "Bắt đầu viết nội dung bài học tại đây...",
       }),
     ],
     content: initialHtml || "",
@@ -123,6 +120,15 @@ export default function LessonTheoryEditor({
     }
   };
 
+  const handleManualSave = async () => {
+    if (!editor) return;
+    if (debounceTimerRef.current) clearTimeout(debounceTimerRef.current);
+    const html = editor.getHTML();
+    const currentRequestId = ++saveRequestIdRef.current;
+    await persist(html, currentRequestId);
+    toast.success("Lưu lý thuyết bài học thành công!");
+  };
+
   // Cleanup on unmount.
   useEffect(() => {
     return () => {
@@ -185,7 +191,23 @@ export default function LessonTheoryEditor({
     <div className="space-y-3">
       <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-border bg-muted/40 px-4 py-2 text-xs">
         <Toolbar editor={editor} />
-        <SaveBadge state={saveState} label={statusLabel} />
+        <div className="flex items-center gap-3">
+          <SaveBadge state={saveState} label={statusLabel} />
+          <Button
+            type="button"
+            size="sm"
+            onClick={() => void handleManualSave()}
+            disabled={saveState === "saving"}
+            className="h-8 gap-1.5 px-3 text-xs font-medium"
+          >
+            {saveState === "saving" ? (
+              <Loader2 className="size-3.5 animate-spin" />
+            ) : (
+              <Save className="size-3.5" />
+            )}
+            Lưu lý thuyết
+          </Button>
+        </div>
       </div>
 
       {recentEditBanner ? (
@@ -234,6 +256,26 @@ export default function LessonTheoryEditor({
 
       <div className="rounded-2xl border border-border bg-card shadow-sm">
         <EditorContent editor={editor} />
+      </div>
+
+      {/* Main Save Action Bar */}
+      <div className="flex items-center justify-between rounded-2xl border border-border bg-card p-4 shadow-sm">
+        <div className="flex items-center gap-2 text-xs text-muted-foreground">
+          <SaveBadge state={saveState} label={statusLabel} />
+        </div>
+        <Button
+          type="button"
+          onClick={() => void handleManualSave()}
+          disabled={saveState === "saving"}
+          className="gap-2 font-semibold shadow-sm"
+        >
+          {saveState === "saving" ? (
+            <Loader2 className="size-4 animate-spin" />
+          ) : (
+            <Save className="size-4" />
+          )}
+          Xác nhận lưu lý thuyết
+        </Button>
       </div>
     </div>
   );

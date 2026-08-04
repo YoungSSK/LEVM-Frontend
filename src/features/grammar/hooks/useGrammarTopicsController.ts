@@ -105,6 +105,7 @@ export function useGrammarTopicsController() {
   const saveTopic = async (payload: {
     name: string;
     description?: string;
+    thumbnail?: string;
   }) => {
     setIsSaving(true);
 
@@ -112,6 +113,7 @@ export function useGrammarTopicsController() {
       const cleanPayload = {
         name: payload.name ?? "",
         description: payload.description,
+        thumbnail: payload.thumbnail,
       };
 
       if (topicEditor?.mode === "edit") {

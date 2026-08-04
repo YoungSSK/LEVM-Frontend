@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
 import PackageAccessSelector from "@/components/PackageAccessSelector";
+import ImageUploadInput from "@/components/ImageUploadInput";
 import type {
   GrammarLesson,
 } from "@/api/grammarLessonApi";
@@ -158,30 +159,14 @@ export default function GrammarLessonFormDialog({
             ) : null}
           </div>
 
-          <div className="space-y-2">
-            <label className="text-sm font-medium text-foreground">
-              Thumbnail URL
-            </label>
-            <Input
-              value={thumbnailUrl}
-              onChange={(event) => setThumbnailUrl(event.target.value)}
-              placeholder="https://..."
-              aria-invalid={Boolean(errors.thumbnailUrl)}
-            />
-            {errors.thumbnailUrl ? (
-              <p className="text-xs text-destructive">
-                {errors.thumbnailUrl}
-              </p>
-            ) : null}
-
-            {thumbnailUrl.trim() ? (
-              <img
-                src={thumbnailUrl}
-                alt={title || "Lesson thumbnail"}
-                className="mt-2 aspect-[16/9] w-full rounded-2xl object-cover"
-              />
-            ) : null}
-          </div>
+          <ImageUploadInput
+            value={thumbnailUrl}
+            onChange={setThumbnailUrl}
+            label="Ảnh Thumbnail Lesson"
+            placeholder="Dán URL ảnh hoặc chọn file từ máy..."
+            error={errors.thumbnailUrl}
+            disabled={isSubmitting}
+          />
 
           <div className="space-y-2">
             <label className="text-sm font-medium text-foreground">
