@@ -11,6 +11,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
+import ImageUploadInput from "@/components/ImageUploadInput";
 import type { GrammarTopic } from "@/api/grammarTopicApi";
 import { validateGrammarTopicForm } from "@/features/grammar/schemas/grammarSchemas";
 
@@ -20,7 +21,7 @@ interface GrammarTopicFormDialogProps {
   topic: GrammarTopic | null;
   isSubmitting: boolean;
   onOpenChange: (open: boolean) => void;
-  onSubmit: (payload: { name: string; description?: string }) => Promise<void>;
+  onSubmit: (payload: { name: string; description?: string; thumbnail?: string }) => Promise<void>;
 }
 
 export default function GrammarTopicFormDialog({
@@ -33,15 +34,17 @@ export default function GrammarTopicFormDialog({
 }: GrammarTopicFormDialogProps) {
   const [name, setName] = useState(topic?.name ?? "");
   const [description, setDescription] = useState(topic?.description ?? "");
+  const [thumbnail, setThumbnail] = useState(topic?.thumbnail ?? "");
   const [errors, setErrors] = useState<{
     name?: string;
     description?: string;
+    thumbnail?: string;
   }>({});
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    const result = validateGrammarTopicForm({ name, description });
+    const result = validateGrammarTopicForm({ name, description, thumbnail });
 
     if (!result.values) {
       setErrors(result.errors);
@@ -98,6 +101,15 @@ export default function GrammarTopicFormDialog({
               </p>
             ) : null}
           </div>
+
+          <ImageUploadInput
+            value={thumbnail}
+            onChange={setThumbnail}
+            label="Ảnh Thumbnail Chủ đề"
+            placeholder="Dán URL ảnh hoặc chọn file từ máy..."
+            error={errors.thumbnail}
+            disabled={isSubmitting}
+          />
 
           <div className="flex gap-2 border-t border-border pt-4">
             <Button

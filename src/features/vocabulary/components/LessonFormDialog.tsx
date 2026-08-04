@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
 import PackageAccessSelector from "@/components/PackageAccessSelector";
+import ImageUploadInput from "@/components/ImageUploadInput";
 import type { VocabularyLesson } from "@/features/vocabulary/types";
 import { validateLessonForm } from "@/features/vocabulary/schemas/vocabularySchemas";
 
@@ -147,28 +148,14 @@ export default function LessonFormDialog({
             ) : null}
           </div>
 
-          <div className="space-y-2">
-            <label className="text-sm font-medium text-foreground">
-              Thumbnail URL
-            </label>
-            <Input
-              value={thumbnail}
-              onChange={(event) => setThumbnail(event.target.value)}
-              placeholder="https://..."
-              aria-invalid={Boolean(errors.thumbnail)}
-            />
-            {errors.thumbnail ? (
-              <p className="text-xs text-destructive">{errors.thumbnail}</p>
-            ) : null}
-
-            {thumbnail.trim() ? (
-              <img
-                src={thumbnail}
-                alt={title || "Lesson thumbnail"}
-                className="mt-2 aspect-[16/9] w-full rounded-2xl object-cover"
-              />
-            ) : null}
-          </div>
+          <ImageUploadInput
+            value={thumbnail}
+            onChange={setThumbnail}
+            label="Ảnh Thumbnail Lesson"
+            placeholder="Dán URL ảnh hoặc chọn file từ máy..."
+            error={errors.thumbnail}
+            disabled={isSubmitting}
+          />
           <div className="space-y-2">
             <label className="text-sm font-medium text-foreground">
               Estimated Time (phút)

@@ -133,6 +133,10 @@ export function useTopicDetailController(topicSlug?: string) {
       estimatedTime: rawPayload.estimatedTime
         ? Number(rawPayload.estimatedTime)
         : undefined,
+      xpReward: rawPayload.xpReward !== undefined
+        ? Number(rawPayload.xpReward)
+        : undefined,
+      allowedPackageIds: rawPayload.allowedPackageIds,
     };
 
     try {

@@ -5,6 +5,7 @@ export interface GrammarTopic {
   name: string;
   slug: string;
   description: string;
+  thumbnail?: string;
   lessonCount: number;
   isActive: boolean;
   order: number;
@@ -57,6 +58,7 @@ export interface TopicPaginationResponse {
 export interface CreateGrammarTopicPayload {
   name: string;
   description?: string;
+  thumbnail?: string;
   order?: number;
   isActive?: boolean;
 }
@@ -64,6 +66,7 @@ export interface CreateGrammarTopicPayload {
 export interface UpdateGrammarTopicPayload {
   name?: string;
   description?: string;
+  thumbnail?: string;
   order?: number;
   isActive?: boolean;
 }

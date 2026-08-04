@@ -130,6 +130,7 @@ export function useGrammarTopicDetailController(topicSlug?: string) {
     estimatedTime?: number;
     xpReward?: number;
     passThreshold?: number;
+    allowedPackageIds?: string[];
   }) => {
     if (!topic) {
       toast.info("Topic chưa sẵn sàng.");

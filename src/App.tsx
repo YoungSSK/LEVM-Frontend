@@ -22,6 +22,8 @@ import ReadingPage from "@/features/reading/page/ReadingPage";
 import ReadingCategoryPage from "@/features/reading/page/ReadingCategoryPage";
 import ReadingCategoryDetailPage from "@/features/reading/page/ReadingCategoryDetailPage";
 import ReadingPassageDetailPage from "@/features/reading/page/ReadingPassageDetailPage";
+import ListeningSetListPage from "@/features/listening/ListeningSetListPage";
+import ListeningSetDetailPage from "@/features/listening/ListeningSetDetailPage";
 import PackagePage from "@/features/packages/page/PackagePage";
 import PackagesListPage from "@/features/packages/page/PackagesListPage";
 import SubscriptionsListPage from "@/features/packages/page/SubscriptionsListPage";
@@ -70,7 +72,7 @@ function App() {
 
   return (
     <TooltipProvider>
-      <Toaster position="bottom-right" richColors />
+      <Toaster position="bottom-right" richColors duration={2000} />
       <BrowserRouter>
         <Routes>
           <Route
@@ -103,6 +105,9 @@ function App() {
               <Route path="categories/:categorySlug" element={<ReadingCategoryDetailPage />} />
               <Route path="passages/:passageSlug" element={<ReadingPassageDetailPage />} />
             </Route>
+            {/* Listening */}
+            <Route path="listening" element={<ListeningSetListPage />} />
+            <Route path="listening/sets/:id" element={<ListeningSetDetailPage />} />
             {/* Membership */}
             <Route path="packages" element={<PackagePage />}>
               <Route index element={<Navigate to="list" replace />} />
